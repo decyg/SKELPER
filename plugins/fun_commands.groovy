@@ -2,13 +2,14 @@ import com.sun.prism.paint.Color
 import command.CommandException
 import command.CommandHelper
 import command.CommandList
-import main.HelperFuncs
+
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import plugin.CommandTag
 
 import plugin.PluginException
 import plugin.PluginInfo
+import plugin.PluginUtil
 import sx.blah.discord.api.IListener
 import sx.blah.discord.handle.obj.IMessage
 import sx.blah.discord.handle.obj.IRole
@@ -33,7 +34,7 @@ class Plugin {
     )
     def AddEmote(IMessage chatSource, List<String> vargs){
 
-        File emoteList = HelperFuncs.getDataFolder("emote")
+        File emoteList = PluginUtil.getDataFolder("emote")
 
         for (File f : emoteList.listFiles()) {
             if(vargs.get(0).equals(FilenameUtils.removeExtension(f.getName()))){
@@ -68,7 +69,7 @@ class Plugin {
             description="Spruce up your chatting experience with an exciting image emoticon"
     )
     def Emote(IMessage chatSource, List<String> vargs){
-        File emoteList = HelperFuncs.getDataFolder("emote")
+        File emoteList = PluginUtil.getDataFolder("emote")
 
         if (vargs.size() == 0) {
 

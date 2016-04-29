@@ -3,7 +3,7 @@ import command.CommandException
 import command.CommandHelper
 import command.CommandList
 import groovy.transform.stc.ClosureParams
-import main.HelperFuncs
+
 import plugin.CommandTag
 
 import plugin.ListenerTag

@@ -184,7 +184,7 @@ class Plugin {
                 "\n" +
                 "</body>");
 
-        File emoteList = HelperFuncs.getDataFolder("pics")
+        File emoteList = PluginUtil.getDataFolder("pics")
 
         File tempP = new File(emoteList.getPath() + "/temp.png");
 
