@@ -28,7 +28,7 @@ public class MainExecutor {
 	private Environment propertiesEnv;
 
 	public final static Logger log = Logger.getLogger("SKELPER");
-	public static IDiscordClient cli;
+	private static IDiscordClient cli;
 
 	public static void main(String[] args) {
 
@@ -54,15 +54,53 @@ public class MainExecutor {
 
 	}
 
-	private static void tryLogin() {
+	private void tryLogin() {
 
-		log.info("Attempting to log in to the discord server");
+		log.warn("Attempting to log in to the discord server");
 
 		Thread loginAtt = new Thread(() -> {
 			try {
+
 				cli.login();
+
+				log.info("Connected successfully");
+
 			} catch (DiscordException e) {
-				log.error("Could not log in to the discord server", e);
+
+				int numRetries = Integer.valueOf(propertiesEnv.getProperty("skelper.login.retries"));
+
+				log.warn("Could not log in to the discord server, attempting " + numRetries + " retries.");
+
+				for(int i = 0; i < numRetries; i++){
+
+					log.warn("Attempt number " + (i + 1) + " to log into discord server.");
+
+					try {
+
+						cli.login();
+
+						log.info("Reconnected successfully");
+
+						return;
+					} catch (DiscordException ignored) {
+						try {
+							Thread.sleep(1000 * 60);
+						} catch (InterruptedException ignored1) {
+						}
+					}
+
+				}
+
+				int timeWait = Integer.valueOf(propertiesEnv.getProperty("skelper.login.timewait"));
+
+				log.error("Severe error, couldn't connect to discord server, going to sleep and trying again in " + timeWait + " minutes.");
+
+				try {
+					Thread.sleep(timeWait * 60 * 1000);
+				} catch (InterruptedException ignored) {
+				}
+
+				tryLogin();
 			}
 		});
 
@@ -71,7 +109,7 @@ public class MainExecutor {
 
 	}
 
-	private static void readyHandle() {
+	private void readyHandle() {
 
 		cli.getDispatcher().registerListener((IListener<ReadyEvent>) discordReady -> {
 
@@ -93,12 +131,11 @@ public class MainExecutor {
 
 	}
 
-	private static void connectionHandle() {
+	private void connectionHandle() {
 
 		cli.getDispatcher().registerListener((IListener<DiscordDisconnectedEvent>) discordDisconnectedEvent -> {
 
 			tryLogin();
-			log.info("Reconnected successfully");
 
 		});
 
