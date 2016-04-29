@@ -1,23 +1,7 @@
-import com.google.gson.Gson
-import command.CommandException
 import command.CommandHelper
-import command.CommandList
-import gui.ava.html.image.generator.HtmlImageGenerator
-import main.HelperFuncs
-import org.apache.commons.io.IOUtils
 import plugin.CommandTag
-
-import plugin.PluginException
 import plugin.PluginInfo
-import sx.blah.discord.api.IListener
 import sx.blah.discord.handle.obj.IMessage
-import sx.blah.discord.util.DiscordException
-import sx.blah.discord.util.HTTP429Exception
-import sx.blah.discord.util.MissingPermissionsException
-import train.CallingPoint_
-import train.StationJSON
-import train.TrainRoute
-import train.TrainService
 
 @PluginInfo(
         name="Useful commands",
