@@ -59,7 +59,7 @@ class Plugin {
         }
 
         if (fromS == null || fromS.equals(""))
-            throw new CommandException(fromS + " is not a valid station sproglet.");
+            throw new CommandException(fromS + " is not a valid station.");
 
         if (vargs.size() == 1) {
 
@@ -211,7 +211,7 @@ class Plugin {
         try {
             chatSource.getChannel().sendFile(new File(emoteList.getPath() + "/temp.png"));
         } catch (IOException | MissingPermissionsException | DiscordException | HTTP429Exception e) {
-            throw new CommandException("Couldn't find the temp picture lol");
+            throw new CommandException("Couldn't find the temp picture");
         }
     }
 

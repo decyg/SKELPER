@@ -19,7 +19,7 @@ import java.awt.Color
 
 @PluginInfo(
         name="Fun commands",
-        description="Contains fun or stupid commands",
+        description="Contains fun commands",
         author="Declan Neilson",
         version="1.0"
 )
@@ -87,13 +87,13 @@ class Plugin {
                     try {
                         chatSource.getChannel().sendFile(f);
                     } catch (IOException | MissingPermissionsException | DiscordException | HTTP429Exception e) {
-                        throw new CommandException("couldn't find that emote");
+                        throw new CommandException("Couldn't find that emote");
                     }
                     return;
                 }
             }
 
-            throw new CommandException("couldn't find that emote");
+            throw new CommandException("Couldn't find that emote");
 
         }
     }
@@ -102,7 +102,7 @@ class Plugin {
             prettyName="Colour me",
             channelScope="all",
             commandPattern="colourme|cm [colour]",
-            description="[WIP] Currently fucked"
+            description="[WIP]"
     )
     def ColourMe(IMessage chatSource, List<String> vargs){
 

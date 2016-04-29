@@ -1,20 +1,13 @@
 package main;
 
 import command.CommandExecutor;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.Environment;
 import plugin.PluginHarness;
-import plugin.PluginLoadingException;
-import sx.blah.discord.api.Event;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.IListener;
 import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent;
@@ -22,19 +15,17 @@ import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
 
-import java.util.*;
+import javax.annotation.PostConstruct;
 
 /**
  * Created by Declan on 09/04/2016.
  */
 @SpringBootApplication
-@Configuration
-@ComponentScan(basePackages = {"spring_controllers"})
-@PropertySource("classpath:application.properties")
+@ComponentScan
 public class MainExecutor {
 
-	@Value("${skelper.token}")
-	private String botToken;
+	@Autowired
+	private Environment propertiesEnv;
 
 	public final static Logger log = Logger.getLogger("SKELPER");
 	public static IDiscordClient cli;
@@ -45,20 +36,11 @@ public class MainExecutor {
 
 	}
 
-	@Bean
-	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-		return new PropertySourcesPlaceholderConfigurer();
-	}
-
-	public MainExecutor(){
-		initialise();
-	}
-
+	@PostConstruct
 	public void initialise(){
-		System.out.println(botToken);
 
 		try {
-			cli = HelperFuncs.getClient(botToken);
+			cli = HelperFuncs.getClient(propertiesEnv.getProperty("skelper.token"));
 		} catch (DiscordException e) {
 			log.error("Could not get the bot client");
 			return;
