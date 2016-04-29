@@ -41,13 +41,13 @@ public class CommandExecutor {
 					if (cmdO.getChannelUse().equals("all") || msg.getChannel().getName().equals(cmdO.getChannelUse())) {
 						cmdO.execCommand(msg, cmdArgsList);
 					} else {
-						CommandHelper.sM(msg, "Use the fucking #" + cmdO.getChannelUse() + " channel idiot");
+						CommandHelper.sM(msg, "Use the #" + cmdO.getChannelUse() + " channel.");
 					}
 
 				} catch (Throwable e) {
 
 					try {
-						CommandHelper.sM(msg, "Fucked it: " + e.getMessage());
+						CommandHelper.sM(msg, "Something happened: " + e.getMessage());
 					} catch (CommandException ignored) {
 					}
 				}
