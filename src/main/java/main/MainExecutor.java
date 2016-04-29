@@ -21,7 +21,7 @@ import javax.annotation.PostConstruct;
  * Created by Declan on 09/04/2016.
  */
 @SpringBootApplication
-@ComponentScan
+@ComponentScan("spring_controllers")
 public class MainExecutor {
 
 	@Autowired
