@@ -19,89 +19,6 @@ import java.util.stream.StreamSupport;
  */
 public final class CommandHelper {
 
-	// string constants
-
-	private static long lastMessage = System.currentTimeMillis();
-
-
-	// helper functions
-
-	public static boolean isValidStation(String code){
-		BufferedReader br = null;
-		String line = "";
-		String cvsSplitBy = ",";
-
-		try {
-
-			br = new BufferedReader(new FileReader(new File("data/station_codes.csv")));
-			while ((line = br.readLine()) != null) {
-
-				// use comma as separator
-				String[] allstat = line.split(cvsSplitBy);
-
-				code = code.toLowerCase();
-
-				if(allstat[1].toLowerCase().equals(code)) {
-					br.close();
-					return true;
-				}
-
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		return false;
-	}
-
-	public static String getStationCode(String station){
-		BufferedReader br = null;
-		String line = "";
-		String cvsSplitBy = ",";
-
-		try {
-
-			br = new BufferedReader(new FileReader(new File("data/station_codes.csv")));
-			while ((line = br.readLine()) != null) {
-
-				// use comma as separator
-				String[] allstat = line.split(cvsSplitBy);
-
-				station = station.toLowerCase();
-
-				if(allstat[0].toLowerCase().contains(station)) {
-					br.close();
-					return allstat[1].toLowerCase();
-				}
-
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		return "";
-	}
-
-	public static boolean v(Object o){return o != null;}
-
 	public static void sM(IMessage source, String line) throws CommandException {
 
 		RequestBuffer.request(() -> {
@@ -202,12 +119,12 @@ public final class CommandHelper {
 	public static SyndFeed rssFromURL(String url) throws IOException, URISyntaxException, FeedException {
 
 
-		URL katU = new URL(url);
-		URI katURI = new URI(katU.getProtocol(), katU.getUserInfo(), katU.getHost(), katU.getPort(), katU.getPath(), katU.getQuery(), katU.getRef());
+		URL rssURL = new URL(url);
+		URI rssURI = new URI(rssURL.getProtocol(), rssURL.getUserInfo(), rssURL.getHost(), rssURL.getPort(), rssURL.getPath(), rssURL.getQuery(), rssURL.getRef());
 
 		SyndFeedInput input = new SyndFeedInput();
 
-		return input.build(new XmlReader(new URL(katURI.toASCIIString())));
+		return input.build(new XmlReader(new URL(rssURI.toASCIIString())));
 
 	}
 

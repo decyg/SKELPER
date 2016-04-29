@@ -40,6 +40,7 @@ class Plugin {
         }
     }
 
+    /*
     @CommandTag(
             prettyName="Train Times",
             channelScope="all",
@@ -214,5 +215,6 @@ class Plugin {
             throw new CommandException("Couldn't find the temp picture");
         }
     }
+    */
 
 }
