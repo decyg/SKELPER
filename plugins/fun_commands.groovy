@@ -162,7 +162,7 @@ class Plugin {
 
                 roleList.add(newRole)
 
-                roleArray = new IRole[roleList.size()];
+                roleArray = new IRole[roleList.size()]
                 roleArray = roleList.toArray(roleArray)
 
                 chatSource.guild.editUserRoles(incomingUser, roleArray)
@@ -171,7 +171,7 @@ class Plugin {
                 newRole.changeName(incomingUser.ID)
 
                // ColourMe(chatSource, vargs)
-                //newRole.changeColor(actColour)
+                newRole.changeColor(actColour)
 
                 //println(chatSource.guild.getRoleByID(incomingUser.discriminator))
                 /*
