@@ -110,18 +110,23 @@ class Plugin {
     )
     def ColourMe(IMessage chatSource, List<String> vargs){
 
-        String colour = vargs.get(0).toLowerCase();
+        String colour = vargs.get(0);
 
         Color actColour;
 
         try {
-            // try to get a color by name using reflection
-            Field f = Color.class.getField(colour);
+            // get color by hex or octal value
+            actColour = Color.decode("#" + colour);
+        } catch (NumberFormatException nfe) {
+            try {
+                // try to get a color by name using reflection
+                Field f = Color.class.getField(colour.toLowerCase());
 
-            actColour = (Color) f.get(null);
-        } catch (Exception ce) {
-            // if we can't get any color return black
-            actColour = Color.black;
+                actColour = (Color) f.get(null);
+            } catch (Exception ce) {
+                // if we can't get any color return black
+                actColour = Color.black;
+            }
         }
 
         System.out.println(actColour)
@@ -131,7 +136,7 @@ class Plugin {
         boolean hasRole = false
         for(IRole r : incomingUser.getRolesForGuild(chatSource.guild)){
             System.out.println(r.name)
-            if(r.name.equals(incomingUser.discriminator)){
+            if(r.name.equals(incomingUser.ID)){
                 hasRole = true;
                 break;
             }
@@ -141,7 +146,7 @@ class Plugin {
 
             for(IRole r : incomingUser.getRolesForGuild(chatSource.guild)){
 
-                if(r.name.equals(incomingUser.discriminator)){
+                if(r.name.equals(incomingUser.ID)){
                    r.changeColor(actColour)
                     break;
                 }
@@ -163,7 +168,7 @@ class Plugin {
                 chatSource.guild.editUserRoles(incomingUser, roleArray)
 
                // Thread.sleep(1000)
-                newRole.changeName(incomingUser.discriminator)
+                newRole.changeName(incomingUser.ID)
 
                // ColourMe(chatSource, vargs)
                 //newRole.changeColor(actColour)
