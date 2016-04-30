@@ -73,6 +73,7 @@ public class CoreEvents {
 
 				try {
 					CommandHelper.sM(msg, "Something happened: " + e.getMessage());
+					e.printStackTrace();
 				} catch (CommandException ignored) {
 				}
 			}

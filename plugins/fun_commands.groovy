@@ -2,7 +2,7 @@ import com.sun.prism.paint.Color
 import command.CommandException
 import command.CommandHelper
 import command.CommandList
-
+import main.ClientSingleton
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import plugin.CommandTag
@@ -11,12 +11,15 @@ import plugin.PluginException
 import plugin.PluginInfo
 import plugin.PluginUtil
 import sx.blah.discord.api.IListener
+import sx.blah.discord.handle.impl.obj.Role
 import sx.blah.discord.handle.obj.IMessage
 import sx.blah.discord.handle.obj.IRole
+import sx.blah.discord.handle.obj.IUser
 import sx.blah.discord.util.DiscordException
 import sx.blah.discord.util.HTTP429Exception
 import sx.blah.discord.util.MissingPermissionsException
 import java.awt.Color
+import java.lang.reflect.Field
 
 @PluginInfo(
         name="Fun commands",
@@ -106,6 +109,84 @@ class Plugin {
             description="[WIP]"
     )
     def ColourMe(IMessage chatSource, List<String> vargs){
+
+        String colour = vargs.get(0).toLowerCase();
+
+        Color actColour;
+
+        try {
+            // try to get a color by name using reflection
+            Field f = Color.class.getField(colour);
+
+            actColour = (Color) f.get(null);
+        } catch (Exception ce) {
+            // if we can't get any color return black
+            actColour = Color.black;
+        }
+
+        System.out.println(actColour)
+
+        IUser incomingUser = chatSource.author
+
+        boolean hasRole = false
+        for(IRole r : incomingUser.getRolesForGuild(chatSource.guild)){
+            System.out.println(r.name)
+            if(r.name.equals(incomingUser.discriminator)){
+                hasRole = true;
+                break;
+            }
+        }
+
+        if(hasRole){
+
+            for(IRole r : incomingUser.getRolesForGuild(chatSource.guild)){
+
+                if(r.name.equals(incomingUser.discriminator)){
+                   r.changeColor(actColour)
+                    break;
+                }
+            }
+
+        } else {
+            IRole newRole
+            IRole[] roleArray
+            try {
+                List<IRole> roleList = incomingUser.getRolesForGuild(chatSource.guild)
+
+                newRole = chatSource.guild.createRole()
+
+                roleList.add(newRole)
+
+                roleArray = new IRole[roleList.size()];
+                roleArray = roleList.toArray(roleArray)
+
+                chatSource.guild.editUserRoles(incomingUser, roleArray)
+
+               // Thread.sleep(1000)
+                newRole.changeName(incomingUser.discriminator)
+
+               // ColourMe(chatSource, vargs)
+                //newRole.changeColor(actColour)
+
+                //println(chatSource.guild.getRoleByID(incomingUser.discriminator))
+                /*
+                for(IRole r : incomingUser.getRolesForGuild(chatSource.guild)){
+                    println(r.name)
+                    if(r.name.equals(incomingUser.discriminator)){
+                        r.changeColor(actColour)
+                        break;
+                    }
+                }*/
+            } catch (Exception e){
+                if(newRole) {
+                    newRole.delete()
+                }
+                throw new CommandException("Cloudflare has gone weird again")
+            }
+
+
+
+        }
 
     }
 

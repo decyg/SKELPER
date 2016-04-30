@@ -24,6 +24,20 @@ class Plugin {
         }
     }
 
+    @CommandTag(
+            prettyName="NSFW Wrapper",
+            channelScope="all",
+            commandPattern="nsfw|nw [url]",
+            description="Wraps a url in code tags so it doesn't autoplay"
+    )
+    def NSFWWrapper(IMessage chatSource, List<String> vargs){
+
+        chatSource.delete()
+
+        CommandHelper.sM(chatSource, "```" + vargs.get(0) + "```")
+
+    }
+
     /*
     @CommandTag(
             prettyName="Train Times",
