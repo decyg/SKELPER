@@ -45,6 +45,8 @@ class Plugin {
             searchTerm = searchTerm + s + " ";
         }
 
+        searchTerm += "is_safe:1";
+
         searchTerm = searchTerm.trim();
 
         SyndFeed feed = null;
