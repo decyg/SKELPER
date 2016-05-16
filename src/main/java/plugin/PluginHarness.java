@@ -7,7 +7,7 @@ import command.CommandList;
 import groovy.lang.GroovyClassLoader;
 import main.MainExecutor;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 import sx.blah.discord.api.*;
 import sx.blah.discord.handle.obj.IMessage;
 

@@ -1,6 +1,7 @@
 package main;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,12 +27,15 @@ public class MainExecutor {
 	@Autowired
 	public Environment propertiesEnv;
 
-	public final static Logger log = Logger.getLogger("SKELPER");
+	//public final static Logger log = Logger.getLogger("SKELPER");
+	public final static Logger log = LoggerFactory.getLogger("SKELPER");
 
 	public static void main(String[] args) {
 
 		// main spring
 		SpringApplication.run(MainExecutor.class, args);
+
+		//LOG.info("test");
 
 
 	}

@@ -10,6 +10,7 @@ import sx.blah.discord.util.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -21,29 +22,47 @@ public final class CommandHelper {
 
 	public static void sM(IMessage source, String line) throws CommandException {
 
-		RequestBuffer.request(() -> {
+		List<String> messageSplit = new ArrayList<>();
+		String tLine = line;
+		int mlimit = 1500;
 
-			try {
+		while(tLine.length() >= mlimit){
+			String part = tLine.substring(0, mlimit-1);
+			tLine = tLine.substring(mlimit);
+			messageSplit.add(part);
+		}
+		messageSplit.add(tLine);
 
-				if(source != null) {
+		for(String partline : messageSplit) {
+			RequestBuffer.request(() -> {
 
-					source.reply("\n" + line);
+				try {
 
-				} else {
+					if (source != null) {
 
-					MainExecutor.log.info("[skelper] " + line);
+						source.reply("\n" + partline);
+
+					} else {
+
+						MainExecutor.log.info("[skelper] " + partline);
+
+					}
+
+				} catch (DiscordException | MissingPermissionsException e) {
+
+					MainExecutor.log.error("Could not send that message", e);
 
 				}
 
-			} catch (DiscordException | MissingPermissionsException e) {
+				return null;
 
-				MainExecutor.log.error("Could not send that message", e);
+			});
 
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ignored) {
 			}
-
-			return null;
-
-		});
+		}
 
 	}
 
