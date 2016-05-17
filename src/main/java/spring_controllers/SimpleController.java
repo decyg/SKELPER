@@ -23,6 +23,7 @@
  */
 package spring_controllers;
 
+import main.ClientSingleton;
 import main.MainExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +39,8 @@ public class SimpleController {
 
 	@RequestMapping(value="/", method = RequestMethod.GET)
 	public String simpleController(Model mod) {
+
+		mod.addAttribute("token", ClientSingleton.cli.getToken());
 
 		return "skelper_status";
 	}
