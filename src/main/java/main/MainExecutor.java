@@ -23,6 +23,8 @@
  */
 package main;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,11 @@ import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
 
 /**
  * Created by Declan on 09/04/2016.
@@ -66,7 +73,7 @@ public class MainExecutor {
 	@PostConstruct
 	public void initialise(){
 
-		ClientSingleton.initClient(propertiesEnv.getProperty("skelper.token"));
+		ClientSingleton.initClient(getToken());
 
 		ClientSingleton.cli.getDispatcher().registerListener(new CoreEvents());
 
@@ -74,6 +81,28 @@ public class MainExecutor {
 				Integer.valueOf(propertiesEnv.getProperty("skelper.login.retries")),
 				Integer.valueOf(propertiesEnv.getProperty("skelper.login.timewait"))
 		);
+
+	}
+
+
+	private String getToken(){
+
+		File tokenFile = new File("config/token");
+
+		if(!tokenFile.exists())
+			System.exit(-1);
+
+		String tok = "";
+
+		try {
+			tok = new String(Files.readAllBytes(tokenFile.toPath()));
+		} catch (IOException e) {
+		}
+
+		if(tok.length() != 59)
+			System.exit(-1);
+
+		return tok;
 
 	}
 
