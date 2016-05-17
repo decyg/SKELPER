@@ -1,6 +1,8 @@
 package spring_controllers;
 
+import main.MainExecutor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -12,13 +14,9 @@ import org.springframework.web.servlet.ModelAndView;
 public class SimpleController {
 
 	@RequestMapping(value="/", method = RequestMethod.GET)
-	public ModelAndView simpleController() {
+	public String simpleController(Model mod) {
 
-
-		ModelAndView modelAndView = new ModelAndView("skelper_status");
-		modelAndView.addObject("shortenedUrl", "yeet");
-
-		return modelAndView;
+		return "skelper_status";
 	}
 
 	@RequestMapping(value="/shutdown", method = RequestMethod.GET)
