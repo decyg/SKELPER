@@ -62,6 +62,8 @@ public final class PluginHarness {
 			log.info("Unloaded all listeners");
 		}
 
+		CommandList.dumpCommands();
+
 		File allPlugins = new File("plugins");
 
 		if (!allPlugins.exists())

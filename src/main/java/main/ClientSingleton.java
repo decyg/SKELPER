@@ -38,9 +38,9 @@ public final class ClientSingleton {
 	public static IDiscordClient cli;
 	private static int numRetries, timeWait;
 
-	public static void initClient(String token)  { //Returns an instance of the discord client
+	public static void initClient(String token)  {
 
-		ClientBuilder clientBuilder = new ClientBuilder(); //Creates the ClientBuilder instance
+		ClientBuilder clientBuilder = new ClientBuilder();
 		clientBuilder.setDaemon(true);
 		clientBuilder.withToken(token);
 

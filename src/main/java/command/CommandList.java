@@ -37,6 +37,11 @@ public final class CommandList {
 
 	private static List<ChatCommand> commandList = new ArrayList<>();
 
+
+	public static void dumpCommands() {
+		commandList.clear();
+	}
+
 	public static void putC(String prettyName, String channelUse, String commandName, String comDes, ChatCommand.CommandFunc func) {
 
 		String incomingCmdName = "[CMD: " + prettyName + "] ";
@@ -64,8 +69,6 @@ public final class CommandList {
 
 		commandList.add(new ChatCommand(channelUse, prettyName, commandName, comDes, func));
 	}
-
-
 
 	private static boolean stringMatchesCmd(ChatCommand com, String inputCmd){
 		// first build the regex from the coms stuff then compare the inputcommand against it
