@@ -66,7 +66,10 @@ public class CoreEvents {
 
 	@EventSubscriber
 	public void HandleDisconnectedEvent(DiscordDisconnectedEvent de){
+
+		log.error("Discord disconnect event thrown, attempting to login again...");
 		ClientSingleton.attemptLogin();
+
 	}
 
 	@EventSubscriber
