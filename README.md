@@ -2,7 +2,7 @@
 
 ## About
 
-This is a modular bot using the Discord4J framework written by Declan Neilson. It dynamically loads plugins written in Groovy. 
+This is a modular bot using the Discord4J framework. It dynamically loads plugins written in Groovy. 
 
 ## How to run it
 
