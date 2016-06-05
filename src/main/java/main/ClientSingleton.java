@@ -28,6 +28,8 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.DiscordException;
 
+import java.util.concurrent.TimeUnit;
+
 import static main.MainExecutor.log;
 
 /**
@@ -87,7 +89,7 @@ public final class ClientSingleton {
 						return;
 					} catch (DiscordException ignored) {
 						try {
-							Thread.sleep(1000 * 60);
+							Thread.sleep(TimeUnit.MINUTES.toMillis(1));
 						} catch (InterruptedException ignored1) {
 						}
 					}
@@ -97,7 +99,8 @@ public final class ClientSingleton {
 				log.error("Severe error, couldn't connect to discord server, going to sleep and trying again in " + timeWait + " minutes.");
 
 				try {
-					Thread.sleep(timeWait * 60 * 1000);
+					Thread.sleep(TimeUnit.MINUTES.toMillis(timeWait));
+
 				} catch (InterruptedException ignored) {
 				}
 

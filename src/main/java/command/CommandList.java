@@ -39,7 +39,28 @@ public final class CommandList {
 
 
 	public static void dumpCommands() {
+
 		commandList.clear();
+
+		putC(
+				"Help Command",
+				"all",
+				"help|he",
+				"Displays the help screen",
+				(chatSource, vargs) -> {
+
+					String response = "Listing all commands ([req] denotes required, <opt> denotes optional, <opt>... denotes multiple optional)\n";
+					response += "Arguments can either be passed in as !command arg1 or !command \"multiple arg\"\n";
+
+					for (ChatCommand e : commandList) {
+						response += "```" + "!" + e.getCommandString() + " - " + e.getDescription() + "```" + "\n";
+					}
+
+					CommandHelper.sM(chatSource, response);
+
+				}
+		);
+
 	}
 
 	public static void putC(String prettyName, String channelUse, String commandName, String comDes, ChatCommand.CommandFunc func) {
@@ -139,29 +160,6 @@ public final class CommandList {
 		}
 
 		throw new CommandException("Invalid command, check !help");
-
-	}
-
-	static {
-
-		putC(
-				"Help Command",
-				"all",
-				"help|he",
-				"Displays the help screen",
-				(chatSource, vargs) -> {
-
-					String response = "Listing all commands ([req] denotes required, <opt> denotes optional, <opt>... denotes multiple optional)\n";
-					response += "Arguments can either be passed in as !command arg1 or !command \"multiple arg\"\n";
-
-					for (ChatCommand e : commandList) {
-						response += "```" + "!" + e.getCommandString() + " - " + e.getDescription() + "```" + "\n";
-					}
-
-					CommandHelper.sM(chatSource, response);
-
-				}
-		);
 
 	}
 
