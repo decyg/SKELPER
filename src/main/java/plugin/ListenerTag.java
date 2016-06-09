@@ -23,8 +23,7 @@
  */
 package plugin;
 
-import sx.blah.discord.api.Event;
-import sx.blah.discord.api.IListener;
+import sx.blah.discord.api.events.Event;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

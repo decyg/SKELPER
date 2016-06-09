@@ -21,27 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import command.ChatCommand
-import command.CommandException
 import command.CommandHelper
-import command.CommandList
-import groovy.transform.stc.ClosureParams
-
 import plugin.CommandTag
-
-import plugin.ListenerTag
-import plugin.PluginException
 import plugin.PluginInfo
-import sx.blah.discord.api.Event
-import sx.blah.discord.api.EventDispatcher
-import sx.blah.discord.api.EventSubscriber
-import sx.blah.discord.api.IListener
-import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent
-import sx.blah.discord.handle.impl.events.MessageReceivedEvent
-import sx.blah.discord.handle.impl.events.TypingEvent
 import sx.blah.discord.handle.obj.IMessage
 
-import java.util.function.Consumer
 import java.util.stream.StreamSupport
 
 @PluginInfo(

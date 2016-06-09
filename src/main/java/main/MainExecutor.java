@@ -23,8 +23,6 @@
  */
 package main;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.ReaderInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,19 +30,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
-import plugin.PluginHarness;
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.api.IListener;
-import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent;
-import sx.blah.discord.handle.impl.events.ReadyEvent;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 
 /**
@@ -59,6 +48,8 @@ public class MainExecutor {
 
 	//public final static Logger log = Logger.getLogger("SKELPER");
 	public final static Logger log = LoggerFactory.getLogger("SKELPER");
+
+	public final static CoreEvents mainEvents = new CoreEvents();
 
 	public static void main(String[] args) {
 
@@ -75,7 +66,7 @@ public class MainExecutor {
 
 		ClientSingleton.initClient(getToken());
 
-		ClientSingleton.cli.getDispatcher().registerListener(new CoreEvents());
+		ClientSingleton.cli.getDispatcher().registerListener(mainEvents);
 
 		ClientSingleton.attemptLogin(
 				Integer.valueOf(propertiesEnv.getProperty("skelper.login.retries")),

@@ -21,28 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import com.sun.prism.paint.Color
 import command.CommandException
 import command.CommandHelper
-import command.CommandList
-import main.ClientSingleton
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import plugin.CommandTag
-
-import plugin.PluginException
 import plugin.PluginInfo
 import plugin.PluginUtil
-import sx.blah.discord.api.IListener
-import sx.blah.discord.handle.impl.obj.Role
 import sx.blah.discord.handle.obj.IMessage
 import sx.blah.discord.handle.obj.IRole
 import sx.blah.discord.handle.obj.IUser
 import sx.blah.discord.util.DiscordException
 import sx.blah.discord.util.HTTP429Exception
 import sx.blah.discord.util.MissingPermissionsException
-import java.awt.Color
+
+import java.awt.*
 import java.lang.reflect.Field
+import java.util.List
 
 @PluginInfo(
         name="Fun commands",

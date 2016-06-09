@@ -29,7 +29,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>groupId</groupId>
+    <groupId>com.github.decyg</groupId>
     <artifactId>SKELPER</artifactId>
     <version>1.0-SNAPSHOT</version>
 
@@ -103,7 +103,7 @@
         <dependency>
             <groupId>com.github.austinv11</groupId>
             <artifactId>Discord4j</artifactId>
-            <version>2.4.9</version>
+            <version>42414e0</version>
         </dependency>
 
         <dependency>

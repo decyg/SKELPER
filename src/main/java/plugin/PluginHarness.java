@@ -23,15 +23,15 @@
  */
 package plugin;
 
-import command.ChatCommand;
-import command.CommandException;
-import command.CommandHelper;
 import command.CommandList;
 import groovy.lang.GroovyClassLoader;
 import main.MainExecutor;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
-import sx.blah.discord.api.*;
+import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.api.events.Event;
+import sx.blah.discord.api.events.EventDispatcher;
+import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.obj.IMessage;
 
 import java.io.File;

@@ -21,17 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.io.FeedException
 import command.CommandException
 import command.CommandHelper
-import command.CommandList
 import plugin.CommandTag
-
-import plugin.PluginException
 import plugin.PluginInfo
-import sx.blah.discord.api.IListener
 import sx.blah.discord.handle.obj.IMessage
 
 import java.util.regex.Matcher

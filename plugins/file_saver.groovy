@@ -21,14 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import org.apache.commons.io.FileUtils
 
-import plugin.PluginException
+import org.apache.commons.io.FileUtils
 import plugin.PluginInfo
 import plugin.PluginUtil
-import sx.blah.discord.api.EventDispatcher
-import sx.blah.discord.api.EventSubscriber
-import sx.blah.discord.api.IListener
+import sx.blah.discord.api.events.EventSubscriber
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent
 import sx.blah.discord.handle.obj.IMessage
 

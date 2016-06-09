@@ -28,7 +28,7 @@ import command.CommandException;
 import command.CommandHelper;
 import command.CommandList;
 import plugin.PluginHarness;
-import sx.blah.discord.api.EventSubscriber;
+import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
@@ -50,6 +50,8 @@ public class CoreEvents {
 	@EventSubscriber
 	public void HandleReadyEvent(ReadyEvent re){
 
+		log.info("ReadyEvent fired!");
+
 		try {
 			cli.changeUsername("SKELPER");
 		} catch (DiscordException | HTTP429Exception ignored) {
@@ -64,6 +66,8 @@ public class CoreEvents {
 
 	}
 
+	/*
+
 	@EventSubscriber
 	public void HandleDisconnectedEvent(DiscordDisconnectedEvent de){
 
@@ -71,6 +75,8 @@ public class CoreEvents {
 		ClientSingleton.attemptLogin();
 
 	}
+
+	*/
 
 	@EventSubscriber
 	public void HandleCommands(MessageReceivedEvent msgE){

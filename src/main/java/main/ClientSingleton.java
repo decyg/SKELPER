@@ -38,13 +38,13 @@ import static main.MainExecutor.log;
 public final class ClientSingleton {
 
 	public static IDiscordClient cli;
-	private static int numRetries, timeWait;
 
 	public static void initClient(String token)  {
 
-		ClientBuilder clientBuilder = new ClientBuilder();
-		clientBuilder.setDaemon(true);
-		clientBuilder.withToken(token);
+		ClientBuilder clientBuilder = new ClientBuilder()
+				.setDaemon(true)
+				.withToken(token)
+				.withReconnects();
 
 		try {
 			cli = clientBuilder.build();
@@ -54,14 +54,7 @@ public final class ClientSingleton {
 
 	}
 
-	public static void attemptLogin(){
-		attemptLogin(numRetries, timeWait);
-	}
-
 	public static void attemptLogin(int nr, int tw){
-
-		numRetries = nr;
-		timeWait = tw;
 
 		log.warn("Attempting to log in to the discord server");
 
@@ -74,9 +67,9 @@ public final class ClientSingleton {
 
 			} catch (DiscordException e) {
 
-				log.warn("Could not log in to the discord server, attempting " + numRetries + " retries.");
+				log.warn("Could not log in to the discord server, attempting " + nr + " retries.");
 
-				for(int i = 0; i < numRetries; i++){
+				for(int i = 0; i < nr; i++){
 
 					log.warn("Attempt number " + (i + 1) + " to log into discord server.");
 
@@ -96,15 +89,15 @@ public final class ClientSingleton {
 
 				}
 
-				log.error("Severe error, couldn't connect to discord server, going to sleep and trying again in " + timeWait + " minutes.");
+				log.error("Severe error, couldn't connect to discord server, going to sleep and trying again in " + tw + " minutes.");
 
 				try {
-					Thread.sleep(TimeUnit.MINUTES.toMillis(timeWait));
+					Thread.sleep(TimeUnit.MINUTES.toMillis(tw));
 
 				} catch (InterruptedException ignored) {
 				}
 
-				attemptLogin(numRetries, timeWait);
+				attemptLogin(nr, tw);
 			}
 		});
 
