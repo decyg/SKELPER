@@ -92,7 +92,7 @@ class media_commands {
 
             link = link.replace("http://kat.cr/", "https://kickass.unblocked.red/");
 
-            response = "\n" + "[S:" + seeds + " P: " + peers + "] " + title + "\n    Desc: " + CommandHelper.getTinyURL(link) + "    Magnet: " + CommandHelper.shortenMagnet(magnet) + "\n" + response;
+            response = "\n" + "[S:" + seeds + " P: " + peers + "] " + title + "\n    Desc: <" + CommandHelper.getTinyURL(link) + ">    Magnet: <" + CommandHelper.shortenMagnet(magnet) + ">\n" + response;
 
             i++;
         }
