@@ -20,3 +20,10 @@ hs_err_pid*
 *.iml
 out
 gen
+data/
+log/
+modules/
+plugindata/
+src/main/java/spring_view/
+src/test/
+target/
