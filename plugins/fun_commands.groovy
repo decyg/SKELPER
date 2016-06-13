@@ -45,7 +45,7 @@ import java.util.List
         author="Declan Neilson",
         version="1.0"
 )
-class Plugin {
+class fun_commands {
 
     @CommandTag(
             prettyName="Add Emote",

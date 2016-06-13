@@ -34,7 +34,7 @@ import java.util.stream.StreamSupport
         author="Declan Neilson",
         version="1.0"
 )
-class Plugin {
+class chat_logger {
 
     @CommandTag(
         prettyName="Search History",

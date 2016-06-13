@@ -40,7 +40,7 @@ import java.util.regex.Pattern
         author="Declan Neilson",
         version="1.0"
 )
-class Plugin {
+class media_commands {
 
     @CommandTag(
             prettyName="KAT Link",

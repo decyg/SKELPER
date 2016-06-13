@@ -35,7 +35,7 @@ import sx.blah.discord.handle.obj.IMessage
         author="Declan Neilson",
         version="1.0"
 )
-class Plugin {
+class file_saver {
 
     @EventSubscriber
     def OnMessageEvent(MessageReceivedEvent e){

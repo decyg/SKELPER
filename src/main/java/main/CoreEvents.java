@@ -23,6 +23,7 @@
  */
 package main;
 
+import com.google.gson.Gson;
 import command.ChatCommand;
 import command.CommandException;
 import command.CommandHelper;
@@ -48,7 +49,7 @@ import static main.MainExecutor.log;
 public class CoreEvents {
 
 	@EventSubscriber
-	public void HandleReadyEvent(ReadyEvent re){
+	public void HandleReadyEvent(ReadyEvent re) {
 
 		log.info("ReadyEvent fired!");
 
@@ -66,21 +67,11 @@ public class CoreEvents {
 
 	}
 
-	/*
-
-	@EventSubscriber
-	public void HandleDisconnectedEvent(DiscordDisconnectedEvent de){
-
-		log.error("Discord disconnect event thrown, attempting to login again...");
-		ClientSingleton.attemptLogin();
-
-	}
-
-	*/
 
 	@EventSubscriber
 	public void HandleCommands(MessageReceivedEvent msgE){
 		IMessage msg = msgE.getMessage();
+
 
 		String commandLine = msg.getContent();
 

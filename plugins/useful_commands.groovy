@@ -32,7 +32,7 @@ import sx.blah.discord.handle.obj.IMessage
         author="Declan Neilson",
         version="1.0"
 )
-class Plugin {
+class useful_commands {
 
     @CommandTag(
             prettyName="Admin Commands",
