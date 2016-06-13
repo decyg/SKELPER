@@ -23,6 +23,7 @@
  */
 package main;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 
 /**
  * Created by Declan on 09/04/2016.
@@ -46,7 +48,6 @@ public class MainExecutor {
 	@Autowired
 	public Environment propertiesEnv;
 
-	//public final static Logger log = Logger.getLogger("SKELPER");
 	public final static Logger log = LoggerFactory.getLogger("SKELPER");
 
 	public final static CoreEvents mainEvents = new CoreEvents();
@@ -55,9 +56,6 @@ public class MainExecutor {
 
 		// main spring
 		SpringApplication.run(MainExecutor.class, args);
-
-		//LOG.info("test");
-
 
 	}
 
