@@ -47,6 +47,28 @@ class useful_commands {
         }
     }
 
+    @CommandTag(
+            prettyName="Show Pinned",
+            channelScope="all",
+            commandPattern="pinned|p",
+            description="Lists pinned messages"
+    )
+    def PinnedCom(IMessage chatSource, List<String> vargs){
+
+        String outMessage = "";
+
+        if(chatSource.channel.pinnedMessages.empty) {
+            CommandHelper.sM(chatSource, "There's no pinned messages to show")
+            return
+        }
+
+        for(IMessage msg : chatSource.channel.pinnedMessages){
+            outMessage += msg.author.getName() + ": " + msg.content + "\n"
+        }
+
+        CommandHelper.sM(chatSource, outMessage)
+
+    }
 
     /*
     @CommandTag(
