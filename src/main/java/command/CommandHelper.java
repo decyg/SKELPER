@@ -45,18 +45,44 @@ public final class CommandHelper {
 
 	public static void sM(IMessage source, String line) throws CommandException {
 
-		List<String> messageSplit = new ArrayList<>();
-		String tLine = line;
+		List<String> bufferedMessage = new ArrayList<>();
+		List<String> messageSplit = new ArrayList<>(Arrays.asList(line.split("\n")));
+
 		int mlimit = 1500;
+		String tempLine = "";
 
-		while(tLine.length() >= mlimit){
-			String part = tLine.substring(0, mlimit-1);
-			tLine = tLine.substring(mlimit);
-			messageSplit.add(part);
+		while (messageSplit.size() > 0){
+
+			String cString = messageSplit.remove(0);
+
+			// add the first message to the buffer
+
+
+			// if the total temp line length is less then that's fine, keep iterating
+			// otherwise if it's just gone over, dump it into the bufferedMessage array, add the thing we just removed back
+			// and clear the templine
+
+			if ((tempLine + cString).length() > mlimit) { // not fine
+
+				// output templine and clear it
+				bufferedMessage.add(tempLine);
+				tempLine = "";
+
+				// then readd the thing we just popped off the list back on top
+				messageSplit.add(0, cString);
+
+			} else {
+				tempLine += cString;
+			}
+
 		}
-		messageSplit.add(tLine);
 
-		for(String partline : messageSplit) {
+		if(bufferedMessage.size() == 0)
+			bufferedMessage.add(tempLine);
+
+
+
+		for(String partline : bufferedMessage) {
 			RequestBuffer.request(() -> {
 
 				try {
@@ -77,14 +103,7 @@ public final class CommandHelper {
 
 				}
 
-				return null;
-
 			});
-
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException ignored) {
-			}
 		}
 
 	}

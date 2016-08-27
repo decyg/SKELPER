@@ -32,7 +32,6 @@ import sx.blah.discord.handle.obj.IMessage
 import sx.blah.discord.handle.obj.IRole
 import sx.blah.discord.handle.obj.IUser
 import sx.blah.discord.util.DiscordException
-import sx.blah.discord.util.HTTP429Exception
 import sx.blah.discord.util.MissingPermissionsException
 
 import java.awt.*
@@ -108,7 +107,7 @@ class fun_commands {
                 if (FilenameUtils.removeExtension(f.getName()).equals(vargs[0].toLowerCase())) {
                     try {
                         chatSource.getChannel().sendFile(f);
-                    } catch (IOException | MissingPermissionsException | DiscordException | HTTP429Exception e) {
+                    } catch (IOException | MissingPermissionsException | DiscordException e) {
                         throw new CommandException("Couldn't find that emote");
                     }
                     return;

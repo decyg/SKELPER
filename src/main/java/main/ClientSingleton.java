@@ -44,7 +44,8 @@ public final class ClientSingleton {
 		ClientBuilder clientBuilder = new ClientBuilder()
 				.setDaemon(true)
 				.withToken(token)
-				.withReconnects();
+				.withPingTimeout(100)
+				.setMaxReconnectAttempts(1000);
 
 		try {
 			cli = clientBuilder.build();

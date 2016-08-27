@@ -35,6 +35,7 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Scanner;
 
 /**
  * Created by Declan on 09/04/2016.
@@ -48,7 +49,7 @@ public class MainExecutor {
 
 	public final static Logger log = LoggerFactory.getLogger("SKELPER");
 
-	public final static CoreEvents mainEvents = new CoreEvents();
+	private final static CoreEvents mainEvents = new CoreEvents();
 
 	public static void main(String[] args) {
 
@@ -83,8 +84,7 @@ public class MainExecutor {
 
 		try {
 			tok = new String(Files.readAllBytes(tokenFile.toPath()));
-		} catch (IOException e) {
-		}
+		} catch (IOException ignored) {}
 
 		if(tok.length() != 59)
 			System.exit(-1);

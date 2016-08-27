@@ -23,19 +23,15 @@
  */
 package main;
 
-import com.google.gson.Gson;
 import command.ChatCommand;
 import command.CommandException;
 import command.CommandHelper;
 import command.CommandList;
 import plugin.PluginHarness;
 import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
 
 import java.util.List;
 import java.util.Map;
@@ -48,16 +44,12 @@ import static main.MainExecutor.log;
  */
 public class CoreEvents {
 
+
+
 	@EventSubscriber
 	public void HandleReadyEvent(ReadyEvent re) {
 
 		log.info("ReadyEvent fired!");
-
-		try {
-			cli.changeUsername("SKELPER");
-		} catch (DiscordException | HTTP429Exception ignored) {
-			log.debug("Couldn't update the username");
-		}
 
 		try {
 			PluginHarness.loadPlugins(cli);
@@ -86,8 +78,14 @@ public class CoreEvents {
 				ChatCommand cmdO = cmdTup.getKey();
 				List<String> cmdArgsList = cmdTup.getValue();
 
-				if (cmdO.getChannelUse().equals("all") || msg.getChannel().getName().equals(cmdO.getChannelUse())) {
+				if (cmdO.getChannelUse().equals("all") ||
+						msg.getChannel().getName().equals(cmdO.getChannelUse()) ||
+						msg.getChannel().getName().equals("dev")) {
+
+					msg.getChannel().setTypingStatus(true);
+
 					cmdO.execCommand(msg, cmdArgsList);
+
 				} else {
 					CommandHelper.sM(msg, "Use the #" + cmdO.getChannelUse() + " channel.");
 				}
@@ -100,6 +98,8 @@ public class CoreEvents {
 				} catch (CommandException ignored) {
 				}
 			}
+
+			msg.getChannel().setTypingStatus(false);
 		}
 
 	}

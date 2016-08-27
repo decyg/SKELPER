@@ -22,11 +22,15 @@
  * SOFTWARE.
  */
 
+
+import com.google.gson.Gson
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.io.FeedException
 import command.CommandException
 import command.CommandHelper
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
 import plugin.CommandTag
 import plugin.PluginInfo
 import sx.blah.discord.handle.obj.IMessage
@@ -42,99 +46,170 @@ import java.util.regex.Pattern
 )
 class media_commands {
 
+    // Constants
+
+    private static final String BASE_STRING = "https://torrentapi.org/pubapi_v2.php?"
+    private static final Gson gObj = new Gson()
+
+
+    // Endpoints
+
+    private static final String ENDP_TOKEN = "get_token=get_token"
+    private static final String ENDP_SEARCH = "mode=search&search_string=%s&token=%s&format=json_extended&sort=seeders&category=14;48;17;44;45;47;42;46;18;41;23;25"
+    private static final String ENDP_TOP = "mode=list&token=%s&format=json_extended&sort=seeders&category=14;48;17;44;45;47;42;46;18;41;23;25"
+
+    // RateLimiting
+    // The rate is 1 request every 2 seconds
+
+    private static long LAST_TIME = System.currentTimeMillis();
+    private static String TOKEN
+
+
+    // POGOS
+
+    private class POGO_Response {
+        List<POGO_Torrent> torrent_results
+
+        String error
+        int error_code
+    }
+
+    private class POGO_Token {
+        String token
+    }
+
+    private class POGO_Torrent {
+        String title
+        String category
+        String download
+        int seeders
+        int leechers
+        String info_page
+
+        String toString() {
+            // seeders, leechers, title, info, magnet wrapped in url
+            return String.format(
+                    "[S:%d|L:%d] %s",
+                    seeders,
+                    leechers,
+                    title
+            )
+        }
+    /* String toString() {
+            return title + "|" + category + "|" + download + "|" + seeders + "|" + leechers + "|" + info_page
+        }*/
+    }
+
+
+
+    // Helper functions
+
+    private def updateToken(){
+        POGO_Token oTok = gObj.fromJson(IOUtils.toString(new URL(BASE_STRING + ENDP_TOKEN), "UTF-8"), POGO_Token.class)
+        TOKEN = oTok.getToken()
+    }
+
+    private POGO_Response makeRateLimitedCall(String sURL){
+
+        if(TOKEN == null) // first time
+            updateToken()
+
+        String sFinal = BASE_STRING + String.format(sURL, TOKEN)
+
+        POGO_Response oRes = gObj.fromJson(IOUtils.toString(new URL(sFinal), "UTF-8"), POGO_Response.class)
+
+        println(oRes)
+
+        if(oRes.error != null){ // uh oh
+
+            switch (oRes.error_code){
+                case 4: // invalid token, update it and go again
+                    println("updating token")
+                    updateToken()
+                    Thread.sleep(2000)
+                    return makeRateLimitedCall(sURL)
+                    break;
+                case 5: // requesting too fast, try again in two seconds
+                    println("going 2fast")
+                    Thread.sleep(2000)
+                    return makeRateLimitedCall(sURL)
+                    break;
+            }
+
+        }
+
+        return oRes;
+    }
+
+    private POGO_Response getTopTorrents(){
+
+        POGO_Response oRes = makeRateLimitedCall(ENDP_TOP)
+
+        return oRes
+
+    }
+
+    private POGO_Response getTopSearchedTorrents(String term){
+
+        POGO_Response oRes = makeRateLimitedCall(String.format(ENDP_SEARCH, URLEncoder.encode(term, "UTF-8"), "%s"))
+
+        return oRes
+
+    }
+
+
+    // Command registrations
+
     @CommandTag(
-            prettyName="KAT Link",
-            channelScope="all",
-            commandPattern="kat|k",
-            description="Gets a link to kat"
+            prettyName="Torrent Search",
+            channelScope="torrents",
+            commandPattern="torrents|ts [search term]",
+            description="Searches for linux distros"
     )
-    def KatLink(IMessage chatSource, List<String> vargs){
-        CommandHelper.sM(chatSource, "https://kickass.unblocked.red/full/");
+    def TorSearch(IMessage chatSource, List<String> vargs){
+
+        List<POGO_Torrent> lstTorrents = getTopSearchedTorrents(vargs.get(0)).torrent_results
+
+        lstTorrents = lstTorrents.reverse()
+
+        while(lstTorrents.size() > 10){
+            lstTorrents.remove(0)
+        }
+
+        String sOut = ""
+
+        for (POGO_Torrent oTor : lstTorrents){
+            sOut += "```" + oTor.toString() + "```" + "\n<" + CommandHelper.shortenMagnet(oTor.download) + ">\n"
+        }
+
+        CommandHelper.sM(chatSource, sOut)
+
     }
 
     @CommandTag(
-            prettyName="KAT Search",
+            prettyName="Torrents Top List",
             channelScope="torrents",
-            commandPattern="katsearch|ks [search term]",
-            description="Searches kat"
+            commandPattern="tortop|tt",
+            description="Lists top 10 linux distros"
     )
-    def KatSearch(IMessage chatSource, List<String> vargs){
-        String searchTerm = "";
+    def TorList(IMessage chatSource, List<String> vargs) {
 
-        for (String s : vargs) {
-            searchTerm = searchTerm + s + " ";
+        List<POGO_Torrent> lstTorrents = getTopTorrents().torrent_results
+
+        lstTorrents = lstTorrents.reverse()
+
+        while(lstTorrents.size() > 10){
+            lstTorrents.remove(0)
         }
 
-        searchTerm += "is_safe:1";
+        String sOut = ""
 
-        searchTerm = searchTerm.trim();
-
-        SyndFeed feed = null;
-        try {
-            feed = CommandHelper.rssFromURL("https://kickass.unblocked.red/usearch/" + searchTerm + "/?rss=1&field=seeders&sorder=desc");
-        } catch (IOException | URISyntaxException | FeedException e) {
-            throw new CommandException("Couldn't parse the rss feed");
+        for (POGO_Torrent oTor : lstTorrents){
+            sOut += "```" + oTor.toString() + "```" + "<" + CommandHelper.shortenMagnet(oTor.download) + ">\n"
         }
 
-        CommandHelper.sM(chatSource, "Listing search results for: " + searchTerm);
+        CommandHelper.sM(chatSource, sOut)
 
-        String response = "";
-        int i = 0;
-        for (SyndEntry e : feed.getEntries()) {
-            if (i > 5)
-                break;
-
-            String title = e.getTitle();
-            String seeds = e.getForeignMarkup().get(3).getValue();
-            String peers = e.getForeignMarkup().get(4).getValue();
-            String magnet = e.getForeignMarkup().get(2).getValue();
-            String link = e.getLink();
-
-            link = link.replace("http://kat.cr/", "https://kickass.unblocked.red/");
-
-            response = "\n" + "[S:" + seeds + " P: " + peers + "] " + title + "\n    Desc: <" + CommandHelper.getTinyURL(link) + ">    Magnet: <" + CommandHelper.shortenMagnet(magnet) + ">\n" + response;
-
-            i++;
-        }
-
-        CommandHelper.sM(chatSource, response);
-    }
-
-    @CommandTag(
-            prettyName="KAT Top List",
-            channelScope="torrents",
-            commandPattern="kattop|kt",
-            description="Lists top 10 kat torrents"
-    )
-    def KatList(IMessage chatSource, List<String> vargs) {
-        SyndFeed feed = null;
-        try {
-            feed = CommandHelper.rssFromURL("https://kickass.unblocked.red/movies/?rss=1&field=seeders&sorder=desc");
-        } catch (IOException | URISyntaxException | FeedException e) {
-            throw new CommandException("Couldn't parse the rss feed");
-        }
-
-        CommandHelper.sM(chatSource, "Listing top seeded results");
-
-        String response = "";
-        int i = 0;
-        for (SyndEntry e : feed.getEntries()) {
-            if (i > 10)
-                break;
-
-            String title = e.getTitle();
-            String seeds = e.getForeignMarkup().get(3).getValue();
-            String peers = e.getForeignMarkup().get(4).getValue();
-            String magnet = e.getForeignMarkup().get(2).getValue();
-            String link = e.getLink();
-
-            link = link.replace("http://kat.cr/", "https://kickass.unblocked.red/");
-
-            response = "\n" + "[S:" + seeds + " P: " + peers + "] " + title + "\n    Desc: <" + CommandHelper.getTinyURL(link) + ">    Magnet: <" + CommandHelper.shortenMagnet(magnet) + ">\n" + response;
-
-            i++;
-        }
-        CommandHelper.sM(chatSource, response);
     }
 
     @CommandTag(
