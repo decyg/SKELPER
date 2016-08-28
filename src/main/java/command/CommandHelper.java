@@ -46,7 +46,17 @@ public final class CommandHelper {
 	public static void sM(IMessage source, String line) throws CommandException {
 
 		List<String> bufferedMessage = new ArrayList<>();
-		List<String> messageSplit = new ArrayList<>(Arrays.asList(line.split("\n")));
+		List<String> messageSplit;
+
+		String splitBy = "";
+
+		if(line.split("\n\n").length > 0){
+			messageSplit = new ArrayList<>(Arrays.asList(line.split("\n\n")));
+			splitBy = "\n\n";
+		} else {
+			messageSplit = new ArrayList<>(Arrays.asList(line.split("\n")));
+			splitBy = "\n";
+		}
 
 		int mlimit = 1500;
 		String tempLine = "";
@@ -72,13 +82,17 @@ public final class CommandHelper {
 				messageSplit.add(0, cString);
 
 			} else {
-				tempLine += cString;
+				if(tempLine.length() == 0){
+					tempLine = cString;
+				} else {
+					tempLine += splitBy + cString;
+				}
+
 			}
 
 		}
 
-		if(bufferedMessage.size() == 0)
-			bufferedMessage.add(tempLine);
+		bufferedMessage.add(tempLine);
 
 
 

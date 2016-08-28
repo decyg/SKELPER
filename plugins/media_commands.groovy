@@ -179,7 +179,10 @@ class media_commands {
         String sOut = ""
 
         for (POGO_Torrent oTor : lstTorrents){
-            sOut += "```" + oTor.toString() + "```" + "\n<" + CommandHelper.shortenMagnet(oTor.download) + ">\n"
+            sOut += "```" + oTor.toString() + "```" +
+                    "^ <" + oTor.info_page + "> ^\n" +
+                    "^ <" + CommandHelper.shortenMagnet(oTor.download) + "> ^\n\n"
+
         }
 
         CommandHelper.sM(chatSource, sOut)
@@ -205,7 +208,10 @@ class media_commands {
         String sOut = ""
 
         for (POGO_Torrent oTor : lstTorrents){
-            sOut += "```" + oTor.toString() + "```" + "<" + CommandHelper.shortenMagnet(oTor.download) + ">\n"
+            sOut += "```" + oTor.toString() + "```" +
+                    "^ <" + oTor.info_page + "> ^\n" +
+                    "^ <" + CommandHelper.shortenMagnet(oTor.download) + "> ^\n\n"
+
         }
 
         CommandHelper.sM(chatSource, sOut)
