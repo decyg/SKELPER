@@ -95,16 +95,22 @@ public final class CommandList {
 		// first build the regex from the coms stuff then compare the inputcommand against it
 		// regex for tokenising cmd string
 
-
-		String argumentRegex = "( (?:(?:\\\"[\\w ]+\\\"|\\w+)(?: )??))"; // this matches "arg here" or arg
+		String argumentRegex = "( (?:(?:\\\"[\\w ]+\\\"|[\\w ]+|\\w+)(?: )??))"; // this matches "arg here" or arg
 
 		String cmdToken = com.getCommandString().split(" ")[0];
 
-		String argToken = com.getCommandString().replace(cmdToken + " ", "");
+		String argToken = com.getCommandString().replace(cmdToken, "");
+
+		argToken = argToken.trim();
 
 		String comparisonRegex = "(" + cmdToken + ")";
 
 		Pattern p = Pattern.compile("(\\<.+\\>\\.{3})|(\\<.+\\>)|(\\[.+\\])"); // group 1 is <>... group 2 is <> and group 3 is []
+
+		Matcher mCount = p.matcher(argToken);
+
+		int argCount = 0;
+		while(mCount.find()){ argCount++; }
 
 		Matcher m = p.matcher(argToken);
 
@@ -127,7 +133,7 @@ public final class CommandList {
 
 	public static Map.Entry<ChatCommand, List<String>> getCmd(String cmd) throws CommandException {
 
-		String argMatcher = "((?:(?:\\\"[\\w ]+\\\"|\\w+)(?: )??))";
+		String argMatcher = "( (?:(?:\"[\\w ]+\"|[\\w ]+|\\w+)(?: )??))";
 
 		List<String> argList = new ArrayList<>();
 
@@ -151,7 +157,7 @@ public final class CommandList {
 						foundarg = foundarg.substring(1, foundarg.length()-1);
 					}
 
-					argList.add(foundarg);
+					argList.add(foundarg.trim());
 
 				}
 

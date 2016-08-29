@@ -23,13 +23,13 @@
  */
 
 
+
 import com.google.gson.Gson
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.io.FeedException
 import command.CommandException
 import command.CommandHelper
-import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
 import plugin.CommandTag
 import plugin.PluginInfo
@@ -170,6 +170,11 @@ class media_commands {
 
         List<POGO_Torrent> lstTorrents = getTopSearchedTorrents(vargs.get(0)).torrent_results
 
+        if(lstTorrents == null || lstTorrents.size() == 0.intValue()){
+            CommandHelper.sM(chatSource, "No torrents found")
+            return
+        }
+
         lstTorrents = lstTorrents.reverse()
 
         while(lstTorrents.size() > 10){
@@ -198,6 +203,11 @@ class media_commands {
     def TorList(IMessage chatSource, List<String> vargs) {
 
         List<POGO_Torrent> lstTorrents = getTopTorrents().torrent_results
+
+        if(lstTorrents == null || lstTorrents.size() == 0.intValue()){
+            CommandHelper.sM(chatSource, "No torrents found")
+            return
+        }
 
         lstTorrents = lstTorrents.reverse()
 
