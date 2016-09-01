@@ -28,7 +28,6 @@ import groovy.lang.GroovyClassLoader;
 import main.MainExecutor;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
-import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.Event;
 import sx.blah.discord.api.events.EventDispatcher;
 import sx.blah.discord.api.events.EventSubscriber;
@@ -40,6 +39,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import static main.ClientSingleton.cli;
+
 /**
  * Created by Declan on 09/04/2016.
  */
@@ -48,19 +49,9 @@ public final class PluginHarness {
 	static Logger log = MainExecutor.log;
 	public static List<Object> registeredListeners = new ArrayList<>();
 
-	public static void loadPlugins(IDiscordClient cli) throws PluginLoadingException {
+	public static void loadPlugins() throws PluginLoadingException {
 
-		if (cli == null)
-			throw new PluginLoadingException("Fatal error, DiscordClient was null");
-
-		EventDispatcher ed = cli.getDispatcher();
-
-		if(registeredListeners.size() > 0) {
-			registeredListeners.forEach(ed::unregisterListener);
-			registeredListeners.clear();
-
-			log.info("Unloaded all listeners");
-		}
+		unloadAllPlugins();
 
 		CommandList.dumpCommands();
 
@@ -157,7 +148,7 @@ public final class PluginHarness {
 					continue;
 				}
 
-				ed.registerListener(listenerInst);
+				cli.getDispatcher().registerListener(listenerInst);
 				registeredListeners.add(listenerInst);
 
 				log.info(pluginLogTag + "Registered listener: " + listenerInst.toString());
@@ -171,11 +162,22 @@ public final class PluginHarness {
 
 			} catch (Exception e) {
 				log.error(pluginLogTag + "Unknown error occurred", e);
-				continue;
 			}
 		}
 
 
 
+	}
+
+	public static void unloadAllPlugins(){
+
+		EventDispatcher ed = cli.getDispatcher();
+
+		if(registeredListeners.size() > 0) {
+			registeredListeners.forEach(ed::unregisterListener);
+			registeredListeners.clear();
+
+			log.info("Unloaded all listeners");
+		}
 	}
 }

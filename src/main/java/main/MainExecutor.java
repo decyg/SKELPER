@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 
@@ -35,7 +36,6 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Scanner;
 
 /**
  * Created by Declan on 09/04/2016.
@@ -49,12 +49,19 @@ public class MainExecutor {
 
 	public final static Logger log = LoggerFactory.getLogger("SKELPER");
 
-	private final static CoreEvents mainEvents = new CoreEvents();
+	public final static CoreEvents mainEvents = new CoreEvents();
+
+	public static MainExecutor mainObject;
 
 	public static void main(String[] args) {
 
 		// main spring
-		SpringApplication.run(MainExecutor.class, args);
+		ConfigurableApplicationContext oCon = SpringApplication.run(MainExecutor.class, args);
+
+		MainExecutor oMain = oCon.getBean(MainExecutor.class);
+
+		mainObject = oMain;
+
 
 	}
 

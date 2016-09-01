@@ -23,7 +23,6 @@
  */
 package main;
 
-import org.springframework.core.env.Environment;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.DiscordException;
@@ -44,8 +43,7 @@ public final class ClientSingleton {
 		ClientBuilder clientBuilder = new ClientBuilder()
 				.setDaemon(true)
 				.withToken(token)
-				.withPingTimeout(100)
-				.setMaxReconnectAttempts(1000);
+				.setMaxReconnectAttempts(0);
 
 		try {
 			cli = clientBuilder.build();
@@ -83,7 +81,7 @@ public final class ClientSingleton {
 						return;
 					} catch (DiscordException ignored) {
 						try {
-							Thread.sleep(TimeUnit.MINUTES.toMillis(1));
+							Thread.sleep(TimeUnit.SECONDS.toMillis(5));
 						} catch (InterruptedException ignored1) {
 						}
 					}

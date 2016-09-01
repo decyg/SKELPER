@@ -29,12 +29,19 @@ import command.CommandHelper;
 import command.CommandList;
 import plugin.PluginHarness;
 import sx.blah.discord.api.events.EventSubscriber;
+import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.util.RateLimitException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static main.ClientSingleton.cli;
 import static main.MainExecutor.log;
@@ -44,7 +51,7 @@ import static main.MainExecutor.log;
  */
 public class CoreEvents {
 
-
+	ScheduledExecutorService scheduledExecutorService;
 
 	@EventSubscriber
 	public void HandleReadyEvent(ReadyEvent re) {
@@ -52,9 +59,24 @@ public class CoreEvents {
 		log.info("ReadyEvent fired!");
 
 		try {
-			PluginHarness.loadPlugins(cli);
+			PluginHarness.loadPlugins();
 		} catch (Exception e) {
 			log.error("Couldn't load plugins", e);
+		}
+
+		scheduledExecutorService = Executors.newScheduledThreadPool(5);
+
+		try {
+			scheduledExecutorService.scheduleAtFixedRate(() -> {
+				try{
+					System.out.println(ClientSingleton.cli.getResponseTime());
+				} catch (Exception e){
+					HandleDisconnect(null);
+					scheduledExecutorService.shutdownNow();
+				}
+
+			}, 0, 5, TimeUnit.SECONDS).get();
+		} catch (InterruptedException | ExecutionException ignored) {
 		}
 
 	}
@@ -102,5 +124,23 @@ public class CoreEvents {
 			msg.getChannel().setTypingStatus(false);
 		}
 
+	}
+
+	@EventSubscriber
+	public void HandleDisconnect(DiscordDisconnectedEvent disE){
+		// right so here we want to deregister all listeners, trash the
+
+		System.out.println("handle disconnect");
+		PluginHarness.unloadAllPlugins();
+
+		cli.getDispatcher().unregisterListener(MainExecutor.mainEvents);
+
+		try {
+			cli.logout();
+		} catch (RateLimitException | DiscordException ignored) {}
+
+		cli = null;
+
+		MainExecutor.mainObject.initialise();
 	}
 }
