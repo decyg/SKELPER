@@ -33,7 +33,9 @@ import command.CommandHelper
 import org.apache.commons.io.IOUtils
 import plugin.CommandTag
 import plugin.PluginInfo
+import sx.blah.discord.api.internal.json.objects.EmbedObject
 import sx.blah.discord.handle.obj.IMessage
+import sx.blah.discord.util.EmbedBuilder
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -157,6 +159,33 @@ class media_commands {
 
     }
 
+    private EmbedObject getEmbedForTorrents(List<POGO_Torrent> lstTorrents){
+
+        lstTorrents = lstTorrents.reverse()
+
+        while(lstTorrents.size() > 10){
+            lstTorrents.remove(0)
+        }
+
+
+        EmbedBuilder torOut = new EmbedBuilder()
+        torOut.withTitle("Searched torrent results")
+
+
+        for (POGO_Torrent oTor : lstTorrents){
+
+            torOut.appendField(
+                    oTor.toString(),
+                    ":information_source: [INFO](" + oTor.info_page + ") :information_source:    :inbox_tray: [MAGNET](" + oTor.download + ") :inbox_tray:",
+                    false
+            )
+
+        }
+
+        return torOut.build()
+
+    }
+
 
     // Command registrations
 
@@ -175,22 +204,7 @@ class media_commands {
             return
         }
 
-        lstTorrents = lstTorrents.reverse()
-
-        while(lstTorrents.size() > 10){
-            lstTorrents.remove(0)
-        }
-
-        String sOut = ""
-
-        for (POGO_Torrent oTor : lstTorrents){
-            sOut += "```" + oTor.toString() + "```" +
-                    "^ <" + oTor.info_page + "> ^\n" +
-                    "^ <" + CommandHelper.shortenMagnet(oTor.download) + "> ^\n\n"
-
-        }
-
-        CommandHelper.sM(chatSource, sOut)
+        CommandHelper.sM(chatSource, getEmbedForTorrents(lstTorrents))
 
     }
 
@@ -209,22 +223,7 @@ class media_commands {
             return
         }
 
-        lstTorrents = lstTorrents.reverse()
-
-        while(lstTorrents.size() > 10){
-            lstTorrents.remove(0)
-        }
-
-        String sOut = ""
-
-        for (POGO_Torrent oTor : lstTorrents){
-            sOut += "```" + oTor.toString() + "```" +
-                    "^ <" + oTor.info_page + "> ^\n" +
-                    "^ <" + CommandHelper.shortenMagnet(oTor.download) + "> ^\n\n"
-
-        }
-
-        CommandHelper.sM(chatSource, sOut)
+        CommandHelper.sM(chatSource, getEmbedForTorrents(lstTorrents))
 
     }
 

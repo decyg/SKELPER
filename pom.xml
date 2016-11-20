@@ -102,8 +102,8 @@
 
         <dependency>
             <groupId>com.github.austinv11</groupId>
-            <artifactId>Discord4j</artifactId>
-            <version>7934555</version>
+            <artifactId>Discord4J</artifactId>
+            <version>e26517c</version>
         </dependency>
 
         <dependency>

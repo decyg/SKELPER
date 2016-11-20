@@ -28,6 +28,7 @@ import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import main.MainExecutor;
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
@@ -45,6 +46,19 @@ import java.util.List;
  * Created by Declan on 07/04/2016.
  */
 public final class CommandHelper {
+
+	public static void sM(IMessage source, EmbedObject obj) throws CommandException {
+
+
+		RequestBuffer.request(() -> {
+			try {
+				source.reply("", obj);
+			} catch (MissingPermissionsException | DiscordException e) {
+				MainExecutor.log.error("Could not send that message", e);
+			}
+		});
+
+	}
 
 	public static void sM(IMessage source, String line) throws CommandException {
 

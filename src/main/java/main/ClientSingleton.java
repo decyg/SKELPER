@@ -26,8 +26,7 @@ package main;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.DiscordException;
-
-import java.util.concurrent.TimeUnit;
+import sx.blah.discord.util.RateLimitException;
 
 import static main.MainExecutor.log;
 
@@ -42,8 +41,7 @@ public final class ClientSingleton {
 
 		ClientBuilder clientBuilder = new ClientBuilder()
 				.setDaemon(true)
-				.withToken(token)
-				.setMaxReconnectAttempts(0);
+				.withToken(token);
 
 		try {
 			cli = clientBuilder.build();
@@ -65,38 +63,8 @@ public final class ClientSingleton {
 				log.info("Connected successfully");
 
 			} catch (DiscordException e) {
-
-				log.warn("Could not log in to the discord server, attempting " + nr + " retries.");
-
-				for(int i = 0; i < nr; i++){
-
-					log.warn("Attempt number " + (i + 1) + " to log into discord server.");
-
-					try {
-
-						cli.login();
-
-						log.info("Reconnected successfully");
-
-						return;
-					} catch (DiscordException ignored) {
-						try {
-							Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-						} catch (InterruptedException ignored1) {
-						}
-					}
-
-				}
-
-				log.error("Severe error, couldn't connect to discord server, going to sleep and trying again in " + tw + " minutes.");
-
-				try {
-					Thread.sleep(TimeUnit.MINUTES.toMillis(tw));
-
-				} catch (InterruptedException ignored) {
-				}
-
-				attemptLogin(nr, tw);
+			} catch (RateLimitException e) {
+				e.printStackTrace();
 			}
 		});
 

@@ -58,10 +58,7 @@ public class MainExecutor {
 		// main spring
 		ConfigurableApplicationContext oCon = SpringApplication.run(MainExecutor.class, args);
 
-		MainExecutor oMain = oCon.getBean(MainExecutor.class);
-
-		mainObject = oMain;
-
+		mainObject = oCon.getBean(MainExecutor.class);
 
 	}
 
