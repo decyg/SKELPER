@@ -32,6 +32,7 @@ import sx.blah.discord.handle.obj.IMessage
 import sx.blah.discord.handle.obj.IRole
 import sx.blah.discord.handle.obj.IUser
 import sx.blah.discord.util.DiscordException
+import sx.blah.discord.util.EmbedBuilder
 import sx.blah.discord.util.MissingPermissionsException
 
 import java.awt.*
@@ -45,6 +46,26 @@ import java.util.List
         version="1.0"
 )
 class fun_commands {
+
+    @CommandTag(
+            prettyName="Spoiler",
+            channelScope="all",
+            commandPattern="spoiler|s [spoiler to hide]",
+            description="Hide a spoiler in an embed"
+    )
+    def AddSpoiler(IMessage chatSource, List<String> vargs){
+
+        chatSource.delete()
+
+        EmbedBuilder spoilerEmbed = new EmbedBuilder()
+
+        spoilerEmbed.withTitle("Spoiler")
+
+        spoilerEmbed.appendField("Click below to see spoiler", "[SPOILER](http://" + URLEncoder.encode(vargs.get(0), "UTF-8") + ")", true)
+
+        CommandHelper.sM(chatSource, spoilerEmbed.build())
+
+    }
 
     @CommandTag(
             prettyName="Add Emote",
