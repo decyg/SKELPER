@@ -21,6 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+
+import com.google.gson.Gson
 import command.CommandException
 import command.CommandHelper
 import org.apache.commons.io.FileUtils
@@ -37,7 +40,9 @@ import sx.blah.discord.util.MissingPermissionsException
 
 import java.awt.*
 import java.lang.reflect.Field
+import java.nio.charset.StandardCharsets
 import java.util.List
+import java.util.stream.Collectors
 
 @PluginInfo(
         name="Fun commands",
@@ -230,6 +235,210 @@ class fun_commands {
 
 
         }
+
+    }
+
+    private static final String BASE_URL = "https://owapi.net"
+    private static final Gson gObj = new Gson()
+
+    // Overwatch Icon URLs
+
+    private static final String COMP_BRONZE = "https://hydra-media.cursecdn.com/overwatch.gamepedia.com/8/89/Badge_1_Bronze.png"
+    private static final String COMP_SILVER = "https://hydra-media.cursecdn.com/overwatch.gamepedia.com/b/bb/Badge_2_Silver.png"
+    private static final String COMP_GOLD = "https://hydra-media.cursecdn.com/overwatch.gamepedia.com/b/b8/Badge_3_Gold.png"
+    private static final String COMP_PLATINUM = "https://hydra-media.cursecdn.com/overwatch.gamepedia.com/f/f8/Badge_4_Platinum.png"
+    private static final String COMP_DIAMOND = "https://hydra-media.cursecdn.com/overwatch.gamepedia.com/2/2f/Badge_5_Diamond.png"
+    private static final String COMP_MASTER = "https://hydra-media.cursecdn.com/overwatch.gamepedia.com/f/f0/Badge_6_Master.png"
+    private static final String COMP_GRANDMASTER = "https://hydra-media.cursecdn.com/overwatch.gamepedia.com/8/87/Badge_7_Grandmaster.png"
+    private static final String COMP_TOP500 = "https://hydra-media.cursecdn.com/overwatch.gamepedia.com/7/73/Badge_8_Top_500.png"
+
+
+    // Overwatch POGOs
+
+    private class POGO_STATS {
+        POGO_STATS_REGION eu
+        POGO_STATS_REGION us
+        POGO_STATS_REGION kr
+        POGO_STATS_REGION any
+    }
+
+    private class POGO_STATS_DSTATS_INNER {
+
+        class OVERALL_STATS {
+            int win_rate
+            int level
+            int prestige
+            String avatar
+            int wins
+            int games
+            int comprank
+            int losses
+        }
+
+        class GAME_STATS {
+            float time_played
+            float healing_done_most_in_game
+            float eliminations_most_in_game
+            float damage_done_most_in_game
+
+            // jesus christ fuck this there's so god damn many
+        }
+
+        class AVERAGE_STATS {
+            float healing_done_avg
+            float eliminations_avg
+            float damage_done_avg
+            float deaths_avg
+
+        }
+
+        OVERALL_STATS overall_stats
+        GAME_STATS game_stats
+        boolean competitive
+        AVERAGE_STATS average_stats
+
+    }
+
+    private class POGO_STATS_DSTATS {
+        POGO_STATS_DSTATS_INNER competitive
+        POGO_STATS_DSTATS_INNER quickplay
+    }
+
+    private class POGO_STATS_DHEROES {
+
+    }
+
+    private class POGO_STATS_DACHIEV {
+
+    }
+
+    private class POGO_STATS_REGION {
+        POGO_STATS_DSTATS stats
+        POGO_STATS_DHEROES heroes
+        POGO_STATS_DACHIEV achievements
+    }
+
+
+    @CommandTag(
+            prettyName="Overwatch stats",
+            channelScope="all",
+            commandPattern="overwatch|owa [battletag#discrim] <region>",
+            description="Fetches a players stats and presents it in rich text "
+    )
+    def Overwatch(IMessage chatSource, List<String> vargs) {
+
+        String raw_username = vargs.get(0)
+        String region = "eu"
+
+        if(vargs.size() == 2)
+            region = vargs.get(1)
+
+        String username = raw_username.replace("#", "-")
+
+        String STATS_ROUTE = "/api/v3/u/$username/stats"
+
+        String sFinal = BASE_URL + STATS_ROUTE
+
+        try{
+
+            URL url = new URL(sFinal)
+            URLConnection connection = url.openConnection()
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36")
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))
+
+            String pageText = reader.lines().collect(Collectors.joining("\n"))
+
+            reader.close()
+
+            POGO_STATS oRes = gObj.fromJson(pageText, POGO_STATS.class)
+
+            POGO_STATS_DSTATS_INNER.OVERALL_STATS oStats_c = oRes.eu.stats.competitive.overall_stats
+            POGO_STATS_DSTATS_INNER.OVERALL_STATS oStats_qp = oRes.eu.stats.quickplay.overall_stats
+            POGO_STATS_DSTATS_INNER.GAME_STATS gStats_c = oRes.eu.stats.competitive.game_stats
+            POGO_STATS_DSTATS_INNER.GAME_STATS gStats_qp = oRes.eu.stats.quickplay.game_stats
+            POGO_STATS_DSTATS_INNER.AVERAGE_STATS aStats_c = oRes.eu.stats.competitive.average_stats
+            POGO_STATS_DSTATS_INNER.AVERAGE_STATS aStats_qp = oRes.eu.stats.quickplay.average_stats
+
+            EmbedBuilder returnEmbed = new EmbedBuilder()
+
+            //returnEmbed.withTitle("$raw_username")
+            returnEmbed.withAuthorName(raw_username)
+            returnEmbed.withColor(255, 102, 0)
+            returnEmbed.withAuthorIcon(oStats_qp.avatar)
+
+            returnEmbed.appendDesc("[Overbuff](https://www.overbuff.com/players/pc/$username)")
+
+            returnEmbed.appendField("Level", "$oStats_qp.level", true)
+            returnEmbed.appendField("Skill Rating", "$oStats_c.comprank", true)
+
+            returnEmbed.appendField(":trophy: COMPETITIVE", "$oStats_c.games games played ($oStats_c.win_rate% won) over $gStats_c.time_played hours.", false)
+
+            returnEmbed.appendField("Average Eliminations", "$aStats_c.eliminations_avg", true)
+            returnEmbed.appendField("Most Eliminations", "$gStats_c.eliminations_most_in_game", true)
+
+            returnEmbed.appendField("Average Damage", "$aStats_c.damage_done_avg", true)
+            returnEmbed.appendField("Most Damage", "$gStats_c.damage_done_most_in_game", true)
+
+            returnEmbed.appendField("Average Healing", "$aStats_c.healing_done_avg", true)
+            returnEmbed.appendField("Most Healing", "$gStats_c.healing_done_most_in_game", true)
+
+            returnEmbed.appendField(":video_game: QUICK PLAY", "$oStats_qp.wins games won over $gStats_qp.time_played hours.", false)
+
+            returnEmbed.appendField("Average Eliminations", "$aStats_qp.eliminations_avg", true)
+            returnEmbed.appendField("Most Eliminations", "$gStats_qp.eliminations_most_in_game", true)
+
+            returnEmbed.appendField("Average Damage", "$aStats_qp.damage_done_avg", true)
+            returnEmbed.appendField("Most Damage", "$gStats_qp.damage_done_most_in_game", true)
+
+            returnEmbed.appendField("Average Healing", "$aStats_qp.healing_done_avg", true)
+            returnEmbed.appendField("Most Healing", "$gStats_qp.healing_done_most_in_game", true)
+
+            returnEmbed.withFooterText("EU")
+
+
+            // gonna do some real nasty switching/if stack for the icon
+
+
+            String chosenIcon = ""
+
+            switch (oStats_c.comprank) {
+                case 1..1499:
+                    chosenIcon = COMP_BRONZE
+                    break
+                case 1500..1999:
+                    chosenIcon = COMP_SILVER
+                    break
+                case 2000..2499:
+                    chosenIcon = COMP_GOLD
+                    break
+                case 2500..2999:
+                    chosenIcon = COMP_PLATINUM
+                    break
+                case 3000..3499:
+                    chosenIcon = COMP_DIAMOND
+                    break
+                case 3500..3999:
+                    chosenIcon = COMP_MASTER
+                    break
+                case 4000..5000:
+                    chosenIcon = COMP_GRANDMASTER
+                    break
+            }
+
+            returnEmbed.withThumbnail(chosenIcon) // this is the comp ico
+
+            //:trophy:
+            //:video_game:
+
+            CommandHelper.sM(chatSource, returnEmbed.build())
+
+        } catch (Exception e){
+            chatSource.reply("Something bad happened :/// try again, make sure your username is correct and is in the format Username#0001")
+        }
+
+
+
 
     }
 
