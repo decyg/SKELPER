@@ -25,6 +25,7 @@
 
 
 
+
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rometools.rome.feed.synd.SyndEntry
@@ -43,11 +44,7 @@ import sx.blah.discord.handle.impl.events.MessageReceivedEvent
 import sx.blah.discord.handle.obj.IMessage
 import sx.blah.discord.util.EmbedBuilder
 
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -303,6 +300,8 @@ class media_commands {
 
                         CommandHelper.sM(torChan, "Is this what you wanted, $it? (replying no/n/nope/nah/nay will keep the term on your watchlist, will time out after 30s)")
 
+
+                        boolean done = false
                         IListener oLis
 
                         Runnable oRun = new Runnable() {
@@ -312,6 +311,8 @@ class media_commands {
                                 Thread.sleep(30000)
 
                                 ClientSingleton.cli.dispatcher.unregisterListener(oLis)
+
+                                done = true
 
                                 CommandHelper.sM(torChan, "Assuming this was correct, removing watch term")
 
@@ -342,6 +343,8 @@ class media_commands {
 
                                         CommandHelper.sM(torChan, "The term will be kept on your watch list.")
 
+                                        done = true
+
                                     }
                                 }
 
@@ -349,6 +352,10 @@ class media_commands {
                         }
 
                         ClientSingleton.cli.dispatcher.registerListener(oLis)
+
+                        while (!done){
+                            Thread.sleep(10000)
+                        }
 
                     }
                 }
