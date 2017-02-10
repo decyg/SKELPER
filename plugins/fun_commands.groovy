@@ -130,7 +130,7 @@ class fun_commands {
         } else {
 
             for (File f : emoteList.listFiles()) {
-                if (FilenameUtils.removeExtension(f.getName()).equals(vargs[0].toLowerCase())) {
+                if (FilenameUtils.removeExtension(f.getName()) == vargs[0].toLowerCase()) {
                     try {
                         chatSource.getChannel().sendFile(f);
                     } catch (IOException | MissingPermissionsException | DiscordException e) {

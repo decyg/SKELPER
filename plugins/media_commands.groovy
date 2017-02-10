@@ -24,19 +24,28 @@
 
 
 
+
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.io.FeedException
 import command.CommandException
 import command.CommandHelper
+import main.ClientSingleton
 import org.apache.commons.io.IOUtils
 import plugin.CommandTag
 import plugin.PluginInfo
+import plugin.PluginUtil
+import sx.blah.discord.api.events.IListener
 import sx.blah.discord.api.internal.json.objects.EmbedObject
+import sx.blah.discord.handle.impl.events.MessageReceivedEvent
 import sx.blah.discord.handle.obj.IMessage
 import sx.blah.discord.util.EmbedBuilder
 
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -186,7 +195,6 @@ class media_commands {
 
     }
 
-
     // Command registrations
 
     @CommandTag(
@@ -200,11 +208,175 @@ class media_commands {
         List<POGO_Torrent> lstTorrents = getTopSearchedTorrents(vargs.get(0)).torrent_results
 
         if(lstTorrents == null || lstTorrents.size() == 0.intValue()){
-            CommandHelper.sM(chatSource, "No torrents found")
+            CommandHelper.sM(chatSource, "No torrents found, would you like to set a watch for this? (yes/y/etc to add to your watchlist)")
+
+            ClientSingleton.cli.dispatcher.registerListener(new IListener<MessageReceivedEvent>() {
+                @Override
+                void handle(MessageReceivedEvent event) {
+
+                    if(event.message.author != chatSource.author || event.message.channel.name != "dev")
+                        return
+
+                    List<String> triggerList = ["yes", "y", "ye", "yeah", "yep", "aye"] as String[]
+
+                    for (String trigger : triggerList){
+                        if(event.message.content.contains(trigger)){
+
+                            File torrentFolder = PluginUtil.getDataFolder("torrents")
+                            File watchlistFile = new File(torrentFolder, "watchlist.json")
+                            watchlistFile.createNewFile()
+                            FileReader fr = new FileReader(watchlistFile)
+
+                            Map<String, List<String>> uRes = gObj.fromJson(fr, new TypeToken<Map<String, List<String>>>(){}.getType())
+
+                            if(uRes == null)
+                                uRes = new HashMap<>()
+
+                            fr.close()
+
+                            String authorID = event.message.author.mention()
+
+                            if(uRes.containsKey(authorID)){
+                                uRes.get(authorID).add(vargs.get(0))
+                            } else {
+                                List<String> temp = new ArrayList<>()
+                                temp.add(vargs.get(0))
+                                uRes.put(authorID, temp)
+                            }
+
+                            Writer writer = new FileWriter(watchlistFile)
+                            gObj.toJson(uRes, writer)
+                            writer.close()
+
+                            CommandHelper.sM(chatSource, "Your watchlist has been updated, use !tw to view your watch list")
+
+                            ClientSingleton.cli.dispatcher.unregisterListener(this)
+                            return
+                        }
+                    }
+
+                }
+            })
+
             return
         }
 
         CommandHelper.sM(chatSource, getEmbedForTorrents(lstTorrents))
+
+    }
+
+
+    media_commands(){
+
+        ScheduledExecutorService exService = Executors.newScheduledThreadPool(1)
+
+        exService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            void run() {
+
+                File torrentFolder = PluginUtil.getDataFolder("torrents")
+                File watchlistFile = new File(torrentFolder, "watchlist.json")
+                FileReader fr = new FileReader(watchlistFile)
+                Map<String, List<String>> uRes = gObj.fromJson(fr, new TypeToken<Map<String, List<String>>>(){}.getType())
+                fr.close()
+
+                uRes.keySet().each {
+                    for(String s : uRes[it]){
+                        Thread.sleep(1000)
+                        List<POGO_Torrent> lstTorrents = getTopSearchedTorrents(s).torrent_results
+
+                        if(lstTorrents == null || lstTorrents.size() < 2)
+                            return
+
+                        CommandHelper.sM(
+                                ClientSingleton.cli.getChannels(false).find {chan -> chan.name == "torrents"},
+                                "$it, some torrents have been found for your watch item $s",
+                                getEmbedForTorrents(lstTorrents)
+                        )
+
+                        uRes.get(it).remove(s)
+
+                        Writer writer = new FileWriter(watchlistFile)
+                        gObj.toJson(uRes, writer)
+                        writer.close()
+
+                    }
+                }
+
+
+            }
+        }, 0, 12, TimeUnit.HOURS)
+
+    }
+
+    @CommandTag(
+            prettyName="Torrent Watchlist",
+            channelScope="torrents",
+            commandPattern="torrentwatchlist|tw <number to delete or term to watch>",
+            description="Lists or manages your watchlist"
+    )
+    def TorWatch(IMessage chatSource, List<String> vargs){
+
+        File torrentFolder = PluginUtil.getDataFolder("torrents")
+        File watchlistFile = new File(torrentFolder, "watchlist.json")
+        watchlistFile.createNewFile()
+        FileReader fr = new FileReader(watchlistFile)
+
+        Map<String, List<String>> uRes = gObj.fromJson(fr, new TypeToken<Map<String, List<String>>>(){}.getType())
+
+        fr.close()
+
+        if(uRes != null && uRes.containsKey(chatSource.author.mention()) && vargs.size() > 0) {
+
+            Integer toDel
+
+            try {
+                toDel = Integer.parseInt(vargs.get(0))
+            } catch (NumberFormatException e){
+
+                uRes.get(chatSource.author.mention()).add(vargs.get(0))
+
+                Writer writer = new FileWriter(watchlistFile)
+                gObj.toJson(uRes, writer)
+                writer.close()
+
+                CommandHelper.sM(chatSource, "Your term has been added to your watchlist.")
+
+                return
+            }
+
+            if((toDel.intValue() < 0 || toDel.intValue() > uRes.get(chatSource.author.mention()).size()))
+                return
+
+            uRes.get(chatSource.author.mention()).remove(toDel)
+
+            Writer writer = new FileWriter(watchlistFile)
+            gObj.toJson(uRes, writer)
+            writer.close()
+
+            CommandHelper.sM(chatSource, "That entry has been removed.")
+
+            return
+
+        }
+
+        if(uRes != null && uRes.containsKey(chatSource.author.mention())){
+
+            if(uRes.get(chatSource.author.mention()).size() == 0){
+                CommandHelper.sM(chatSource, "Your watch list is empty!")
+                return
+            }
+
+            String temp = "Your watch list is as follows (!tw number will remove the numbered item from being watched): \n"
+            int i = 0
+
+            for(String s : uRes.get(chatSource.author.mention())){
+                temp += "$i: $s\n"
+                i++
+            }
+
+            CommandHelper.sM(chatSource, temp)
+        }
 
     }
 
