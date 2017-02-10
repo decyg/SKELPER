@@ -43,7 +43,9 @@ import sx.blah.discord.handle.impl.events.MessageReceivedEvent
 import sx.blah.discord.handle.obj.IMessage
 import sx.blah.discord.util.EmbedBuilder
 
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.Future
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
@@ -214,7 +216,7 @@ class media_commands {
                 @Override
                 void handle(MessageReceivedEvent event) {
 
-                    if(event.message.author != chatSource.author || event.message.channel.name != "dev")
+                    if(event.message.author != chatSource.author || event.message.channel.name != "torrents")
                         return
 
                     List<String> triggerList = ["yes", "y", "ye", "yeah", "yep", "aye"] as String[]
@@ -268,9 +270,12 @@ class media_commands {
 
     media_commands(){
 
-        ScheduledExecutorService exService = Executors.newScheduledThreadPool(1)
+        ScheduledExecutorService exServiceTimed = Executors.newScheduledThreadPool(1)
 
-        exService.scheduleAtFixedRate(new Runnable() {
+        ExecutorService exService = Executors.newCachedThreadPool()
+
+
+        exServiceTimed.scheduleAtFixedRate(new Runnable() {
             @Override
             void run() {
 
@@ -288,17 +293,62 @@ class media_commands {
                         if(lstTorrents == null || lstTorrents.size() < 2)
                             return
 
+                        def torChan = ClientSingleton.cli.getChannels(false).find {chan -> chan.name == "torrents"}
+
                         CommandHelper.sM(
-                                ClientSingleton.cli.getChannels(false).find {chan -> chan.name == "torrents"},
+                                torChan,
                                 "$it, some torrents have been found for your watch item $s",
                                 getEmbedForTorrents(lstTorrents)
                         )
 
-                        uRes.get(it).remove(s)
+                        CommandHelper.sM(torChan, "Is this what you wanted, $it? (replying no/n/nope/nah/nay will keep the term on your watchlist, will time out after 30s)")
 
-                        Writer writer = new FileWriter(watchlistFile)
-                        gObj.toJson(uRes, writer)
-                        writer.close()
+                        IListener oLis
+
+                        Runnable oRun = new Runnable() {
+                            @Override
+                            void run() {
+
+                                Thread.sleep(30000)
+
+                                ClientSingleton.cli.dispatcher.unregisterListener(oLis)
+
+                                CommandHelper.sM(torChan, "Assuming this was correct, removing watch term")
+
+                                uRes.get(it).remove(s)
+
+                                Writer writer = new FileWriter(watchlistFile)
+                                gObj.toJson(uRes, writer)
+                                writer.close()
+
+                            }
+                        }
+
+
+                        Future<?> oFut = exService.submit(oRun)
+
+                        oLis = new IListener<MessageReceivedEvent>() {
+                            @Override
+                            void handle(MessageReceivedEvent event) {
+
+                                if (event.message.author.mention() != it || event.message.channel.name != "torrents")
+                                    return
+
+                                List<String> triggerList = ["no", "n", "nope", "nah", "nay"] as String[]
+
+                                for (String trigger : triggerList) {
+                                    if (event.message.content.contains(trigger)) {
+                                        oFut.cancel(true)
+
+                                        CommandHelper.sM(torChan, "The term will be kept on your watch list.")
+
+                                    }
+                                }
+
+                            }
+                        }
+
+                        ClientSingleton.cli.dispatcher.registerListener(oLis)
 
                     }
                 }

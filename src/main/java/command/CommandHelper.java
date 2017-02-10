@@ -48,6 +48,18 @@ import java.util.List;
  */
 public final class CommandHelper {
 
+	public static void sM(IChannel source, String message) throws CommandException {
+
+		RequestBuffer.request(() -> {
+			try {
+				source.sendMessage(message);
+			} catch (MissingPermissionsException | DiscordException e) {
+				MainExecutor.log.error("Could not send that message", e);
+			}
+		});
+
+	}
+
 	public static void sM(IChannel source, String message, EmbedObject obj) throws CommandException {
 
 		RequestBuffer.request(() -> {
