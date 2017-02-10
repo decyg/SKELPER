@@ -267,6 +267,7 @@ class media_commands {
 
     }
 
+    Runnable oWatch
 
     media_commands(){
 
@@ -274,8 +275,7 @@ class media_commands {
 
         ExecutorService exService = Executors.newCachedThreadPool()
 
-
-        exServiceTimed.scheduleAtFixedRate(new Runnable() {
+        oWatch = new Runnable() {
             @Override
             void run() {
 
@@ -355,7 +355,9 @@ class media_commands {
 
 
             }
-        }, 0, 12, TimeUnit.HOURS)
+        }
+
+        exServiceTimed.scheduleAtFixedRate(oWatch, 0, 12, TimeUnit.HOURS)
 
     }
 
@@ -427,6 +429,20 @@ class media_commands {
 
             CommandHelper.sM(chatSource, temp)
         }
+
+    }
+
+    @CommandTag(
+            prettyName="Torrent Check",
+            channelScope="torrents",
+            commandPattern="torcheck|tc",
+            description="Checks your watchlist"
+    )
+    def TorCheck(IMessage chatSource, List<String> vargs) {
+
+        CommandHelper.sM(chatSource, "Running a manual check on your watchlist, if there's no results, its found nothing.")
+
+        oWatch.run()
 
     }
 
