@@ -27,3 +27,4 @@ plugindata/
 src/main/java/spring_view/
 src/test/
 target/
+/config/token
