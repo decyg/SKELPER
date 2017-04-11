@@ -21,11 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 import command.CommandHelper
 import plugin.CommandTag
 import plugin.PluginInfo
+import sx.blah.discord.api.events.IListener
+import sx.blah.discord.handle.impl.events.guild.channel.message.reaction.ReactionAddEvent
+import sx.blah.discord.handle.impl.events.guild.channel.message.reaction.ReactionRemoveEvent
 import sx.blah.discord.handle.obj.IMessage
 import sx.blah.discord.util.EmbedBuilder
+import sx.blah.discord.util.RequestBuffer
 
 @PluginInfo(
         name="Useful commands",
@@ -82,7 +87,7 @@ class useful_commands {
             7:"seven",
             8:"eight",
             9:"nine",
-            10:"10"
+            10:"ten"
     ]
 
     @CommandTag(
@@ -94,23 +99,52 @@ class useful_commands {
     def PollComm(IMessage chatSource, List<String> vargs){
 
         String pollTitle = vargs.get(0)
+        List<String> pollOptions = new ArrayList(Arrays.asList(vargs.get(1).split(" ")))
 
         EmbedBuilder pollEmbed = new EmbedBuilder()
         .withTitle(pollTitle)
         .withDesc("vote on the poll by reacting to the appropriately numbered reactions.")
 
-        for(int i = 1; i++; i < vargs.size()){
 
-            pollEmbed.appendField("Option " + i + ": " + vargs.get(i), "No votes", false)
+        int i = 0
 
+        for(String s : pollOptions){
+
+            pollEmbed.appendField("Option " + (i + 1) + ": " + pollOptions.get(i), "No votes", false)
+
+            i++
         }
+
 
         IMessage res = CommandHelper.sM(chatSource, pollEmbed.build())
 
-        for(int i = 1; i++; i < vargs.size()){
+        int n = 1
 
-            res.addReaction(":" + numberMap[i] + ":")
+        for(String s : pollOptions){
 
+            RequestBuffer.request(new RequestBuffer.IVoidRequest() {
+                @Override
+                void doRequest() {
+                    println("add reaction: " + numberMap[n])
+                    res.addReaction(":" + numberMap[n] + ":")
+                }
+            }).get()
+
+            chatSource.client.dispatcher.registerListener(new IListener<ReactionAddEvent>() {
+                @Override
+                void handle(ReactionAddEvent event) {
+                    event.reaction.unicodeEmoji
+                }
+            })
+
+            chatSource.client.dispatcher.registerListener(new IListener<ReactionRemoveEvent>() {
+                @Override
+                void handle(ReactionRemoveEvent event) {
+
+                }
+            })
+
+            n++
         }
 
     }

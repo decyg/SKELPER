@@ -74,17 +74,15 @@ public final class CommandHelper {
 
 	public static IMessage sM(IMessage source, EmbedObject obj) throws CommandException {
 
-		final IMessage[] ret = {null};
-
-		RequestBuffer.request(() -> {
+		return RequestBuffer.request(() -> {
 			try {
-				ret[0] = source.reply("", obj);
+				return source.reply("", obj);
 			} catch (MissingPermissionsException | DiscordException e) {
 				MainExecutor.log.error("Could not send that message", e);
 			}
-		});
 
-		return ret[0];
+			return null;
+		}).get();
 
 	}
 
