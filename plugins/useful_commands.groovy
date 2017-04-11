@@ -25,6 +25,7 @@ import command.CommandHelper
 import plugin.CommandTag
 import plugin.PluginInfo
 import sx.blah.discord.handle.obj.IMessage
+import sx.blah.discord.util.EmbedBuilder
 
 @PluginInfo(
         name="Useful commands",
@@ -67,6 +68,50 @@ class useful_commands {
         }
 
         CommandHelper.sM(chatSource, outMessage)
+
+    }
+
+    // advanced enterprise grade programming
+    def numberMap = [
+            1:"one",
+            2:"two",
+            3:"three",
+            4:"four",
+            5:"five",
+            6:"six",
+            7:"seven",
+            8:"eight",
+            9:"nine",
+            10:"10"
+    ]
+
+    @CommandTag(
+            prettyName="Create poll",
+            channelScope="all",
+            commandPattern="poll|po [poll title] <options>...",
+            description="Creates a poll with up to 10 options"
+    )
+    def PollComm(IMessage chatSource, List<String> vargs){
+
+        String pollTitle = vargs.get(0)
+
+        EmbedBuilder pollEmbed = new EmbedBuilder()
+        .withTitle(pollTitle)
+        .withDesc("vote on the poll by reacting to the appropriately numbered reactions.")
+
+        for(int i = 1; i++; i < vargs.size()){
+
+            pollEmbed.appendField("Option " + i + ": " + vargs.get(i), "No votes", false)
+
+        }
+
+        IMessage res = CommandHelper.sM(chatSource, pollEmbed.build())
+
+        for(int i = 1; i++; i < vargs.size()){
+
+            res.addReaction(":" + numberMap[i] + ":")
+
+        }
 
     }
 

@@ -121,6 +121,8 @@ class media_commands {
 
     private POGO_Response makeRateLimitedCall(String sURL){
 
+        System.setProperty("http.agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36")
+
         if(TOKEN == null) // first time
             updateToken()
 
@@ -171,7 +173,7 @@ class media_commands {
 
         lstTorrents = lstTorrents.reverse()
 
-        while(lstTorrents.size() > 10){
+        while(lstTorrents.size() > 7){
             lstTorrents.remove(0)
         }
 
@@ -184,7 +186,7 @@ class media_commands {
 
             torOut.appendField(
                     oTor.toString(),
-                    ":information_source: [INFO](" + oTor.info_page + ") :information_source:    :inbox_tray: [MAGNET](" + oTor.download + ") :inbox_tray:",
+                    ":inbox_tray: [MAGNET](" + oTor.download + ")",
                     false
             )
 
@@ -284,7 +286,7 @@ class media_commands {
 
                 uRes.keySet().each {
                     for(String s : uRes[it]){
-                        Thread.sleep(1000)
+                        Thread.sleep(10000)
                         List<POGO_Torrent> lstTorrents = getTopSearchedTorrents(s).torrent_results
 
                         if(lstTorrents == null || lstTorrents.size() < 2)

@@ -25,14 +25,7 @@ package main;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.env.Environment;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,12 +33,7 @@ import java.nio.file.Files;
 /**
  * Created by Declan on 09/04/2016.
  */
-@SpringBootApplication
-@ComponentScan("spring_controllers")
 public class MainExecutor {
-
-	@Autowired
-	public Environment propertiesEnv;
 
 	public final static Logger log = LoggerFactory.getLogger("SKELPER");
 
@@ -55,27 +43,19 @@ public class MainExecutor {
 
 	public static void main(String[] args) {
 
-		// main spring
-		ConfigurableApplicationContext oCon = SpringApplication.run(MainExecutor.class, args);
-
-		mainObject = oCon.getBean(MainExecutor.class);
+		new MainExecutor();
 
 	}
 
-	@PostConstruct
-	public void initialise(){
+	private MainExecutor() {
 
 		ClientSingleton.initClient(getToken());
 
 		ClientSingleton.cli.getDispatcher().registerListener(mainEvents);
 
-		ClientSingleton.attemptLogin(
-				Integer.valueOf(propertiesEnv.getProperty("skelper.login.retries")),
-				Integer.valueOf(propertiesEnv.getProperty("skelper.login.timewait"))
-		);
+		ClientSingleton.attemptLogin();
 
 	}
-
 
 	private String getToken(){
 

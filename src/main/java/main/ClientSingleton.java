@@ -26,7 +26,6 @@ package main;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.RateLimitException;
 
 import static main.MainExecutor.log;
 
@@ -40,7 +39,6 @@ public final class ClientSingleton {
 	public static void initClient(String token)  {
 
 		ClientBuilder clientBuilder = new ClientBuilder()
-				.setDaemon(true)
 				.withToken(token);
 
 		try {
@@ -51,24 +49,13 @@ public final class ClientSingleton {
 
 	}
 
-	public static void attemptLogin(int nr, int tw){
+	public static void attemptLogin(){
 
 		log.warn("Attempting to log in to the discord server");
 
-		Thread loginAtt = new Thread(() -> {
-			try {
+		cli.login();
 
-				cli.login();
-
-				log.info("Connected successfully");
-
-			} catch (DiscordException e) {
-			} catch (RateLimitException e) {
-				e.printStackTrace();
-			}
-		});
-
-		loginAtt.start();
+		log.info("Connected successfully");
 
 	}
 }

@@ -23,11 +23,13 @@
  */
 
 
+
 import com.google.gson.Gson
 import command.CommandException
 import command.CommandHelper
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.IOUtils
 import plugin.CommandTag
 import plugin.PluginInfo
 import plugin.PluginUtil
@@ -40,9 +42,7 @@ import sx.blah.discord.util.MissingPermissionsException
 
 import java.awt.*
 import java.lang.reflect.Field
-import java.nio.charset.StandardCharsets
 import java.util.List
-import java.util.stream.Collectors
 
 @PluginInfo(
         name="Fun commands",
@@ -341,15 +341,10 @@ class fun_commands {
 
         try{
 
+
             URL url = new URL(sFinal)
-            URLConnection connection = url.openConnection()
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36")
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))
-
-            String pageText = reader.lines().collect(Collectors.joining("\n"))
-
-            reader.close()
+            String pageText = IOUtils.toString(url, "UTF-8")
 
             POGO_STATS oRes = gObj.fromJson(pageText, POGO_STATS.class)
 
@@ -435,6 +430,7 @@ class fun_commands {
 
         } catch (Exception e){
             chatSource.reply("Something bad happened :/// try again, make sure your username is correct and is in the format Username#0001")
+            e.printStackTrace()
         }
 
 
