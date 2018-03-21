@@ -40,7 +40,7 @@ import plugin.PluginInfo
 import plugin.PluginUtil
 import sx.blah.discord.api.events.IListener
 import sx.blah.discord.api.internal.json.objects.EmbedObject
-import sx.blah.discord.handle.impl.events.MessageReceivedEvent
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent
 import sx.blah.discord.handle.obj.IMessage
 import sx.blah.discord.util.EmbedBuilder
 
@@ -58,15 +58,15 @@ class media_commands {
 
     // Constants
 
-    private static final String BASE_STRING = "https://torrentapi.org/pubapi_v2.php?"
+    private static final String BASE_STRING = "https://torrentapi.org/pubapi_v2.php?app_id=skelper"
     private static final Gson gObj = new Gson()
 
 
     // Endpoints
 
-    private static final String ENDP_TOKEN = "get_token=get_token"
-    private static final String ENDP_SEARCH = "mode=search&search_string=%s&token=%s&format=json_extended&sort=seeders&category=14;48;17;44;45;47;42;46;18;41;23;25"
-    private static final String ENDP_TOP = "mode=list&token=%s&format=json_extended&sort=seeders&category=14;48;17;44;45;47;42;46;18;41;23;25"
+    private static final String ENDP_TOKEN = "&get_token=get_token"
+    private static final String ENDP_SEARCH = "&mode=search&search_string=%s&token=%s&format=json_extended&sort=seeders&category=14;48;17;44;45;47;42;46;18;41;23;25"
+    private static final String ENDP_TOP = "&mode=list&token=%s&format=json_extended&sort=seeders&category=14;48;17;44;45;47;42;46;18;41;23;25"
 
     // RateLimiting
     // The rate is 1 request every 2 seconds
@@ -115,20 +115,24 @@ class media_commands {
     // Helper functions
 
     private def updateToken(){
-        POGO_Token oTok = gObj.fromJson(IOUtils.toString(new URL(BASE_STRING + ENDP_TOKEN), "UTF-8"), POGO_Token.class)
+        def content = new URL(BASE_STRING + ENDP_TOKEN).getText(requestProperties: ['User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"])
+
+        POGO_Token oTok = gObj.fromJson(content, POGO_Token.class)
         TOKEN = oTok.getToken()
     }
 
     private POGO_Response makeRateLimitedCall(String sURL){
 
-        System.setProperty("http.agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36")
+        //System.setProperty("http.agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36")
 
         if(TOKEN == null) // first time
             updateToken()
 
         String sFinal = BASE_STRING + String.format(sURL, TOKEN)
 
-        POGO_Response oRes = gObj.fromJson(IOUtils.toString(new URL(sFinal), "UTF-8"), POGO_Response.class)
+        def content = new URL(sFinal).getText(requestProperties: ['User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"])
+
+        POGO_Response oRes = gObj.fromJson(content, POGO_Response.class)
 
         println(oRes)
 
@@ -186,7 +190,7 @@ class media_commands {
 
             torOut.appendField(
                     oTor.toString(),
-                    ":inbox_tray: [MAGNET](" + oTor.download + ")",
+                    CommandHelper.shortenMagnet(oTor.download),
                     false
             )
 
