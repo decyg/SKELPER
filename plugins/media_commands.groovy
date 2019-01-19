@@ -115,9 +115,11 @@ class media_commands {
     // Helper functions
 
     private def updateToken(){
-        def content = new URL(BASE_STRING + ENDP_TOKEN).getText(requestProperties: ['User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"])
+        def contentCon = new URL(BASE_STRING + ENDP_TOKEN).openConnection()
 
-        POGO_Token oTok = gObj.fromJson(content, POGO_Token.class)
+        contentCon.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+
+        POGO_Token oTok = gObj.fromJson(contentCon.inputStream.getText(), POGO_Token.class)
         TOKEN = oTok.getToken()
     }
 
@@ -130,9 +132,11 @@ class media_commands {
 
         String sFinal = BASE_STRING + String.format(sURL, TOKEN)
 
-        def content = new URL(sFinal).getText(requestProperties: ['User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"])
+        def contentCon = new URL(sFinal).openConnection()
 
-        POGO_Response oRes = gObj.fromJson(content, POGO_Response.class)
+        contentCon.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+
+        POGO_Response oRes = gObj.fromJson(contentCon.inputStream.getText(), POGO_Response.class)
 
         println(oRes)
 
