@@ -82,6 +82,12 @@ class media_commands {
 
         String error
         int error_code
+
+        POGO_Response(torrent_results, error, error_code){
+            this.torrent_results = torrent_results
+            this.error = error
+            this.error_code = error_code
+        }
     }
 
     private class POGO_Token {
@@ -115,12 +121,17 @@ class media_commands {
     // Helper functions
 
     private def updateToken(){
+
+        Thread.sleep(2000)
+
         def contentCon = new URL(BASE_STRING + ENDP_TOKEN).openConnection()
 
         contentCon.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
 
         POGO_Token oTok = gObj.fromJson(contentCon.inputStream.getText(), POGO_Token.class)
         TOKEN = oTok.getToken()
+
+        Thread.sleep(2000)
     }
 
     private POGO_Response makeRateLimitedCall(String sURL){
@@ -128,7 +139,10 @@ class media_commands {
         //System.setProperty("http.agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36")
 
         if(TOKEN == null) // first time
+        {
+            println("updating token for first time")
             updateToken()
+        }
 
         String sFinal = BASE_STRING + String.format(sURL, TOKEN)
 
@@ -136,9 +150,16 @@ class media_commands {
 
         contentCon.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
 
-        POGO_Response oRes = gObj.fromJson(contentCon.inputStream.getText(), POGO_Response.class)
+        POGO_Response oRes;
 
-        println(oRes)
+        try{
+            oRes = gObj.fromJson(contentCon.inputStream.getText(), POGO_Response.class)
+
+        } catch(Exception ex){
+            println("bad thing happened, see the following exception")
+            ex.printStackTrace()
+            oRes = new POGO_Response(new ArrayList<String>(), "", 4)
+        }
 
         if(oRes.error != null){ // uh oh
 
