@@ -299,7 +299,10 @@ class media_commands {
 
     media_commands(){
 
-        ScheduledExecutorService exServiceTimed = Executors.newScheduledThreadPool(1)
+        CookieManager cookieManager = new CookieManager();
+        CookieHandler.setDefault(cookieManager);
+
+       /* ScheduledExecutorService exServiceTimed = Executors.newScheduledThreadPool(1)
 
         ExecutorService exService = Executors.newCachedThreadPool()
 
@@ -395,7 +398,7 @@ class media_commands {
             }
         }
 
-        exServiceTimed.scheduleAtFixedRate(oWatch, 0, 12, TimeUnit.HOURS)
+        exServiceTimed.scheduleAtFixedRate(oWatch, 0, 12, TimeUnit.HOURS)*/
 
     }
 
@@ -480,7 +483,7 @@ class media_commands {
 
         CommandHelper.sM(chatSource, "Running a manual check on your watchlist, if there's no results, its found nothing.")
 
-        oWatch.run()
+        //oWatch.run()
 
     }
 
